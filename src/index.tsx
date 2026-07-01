@@ -20,33 +20,31 @@ import { loginPage, registerPage } from './pages/auth'
 
 const app = new Hono()
 
-const html = (s: string) => new Response(s, { headers: { 'Content-Type': 'text/html; charset=utf-8' } })
-
 // Mount API routes
 app.route('/api', api)
 
-app.get('/', (c) => html(page({ title: 'الرئيسية', active: 'home', desc: 'مؤسسة الدكتور عمر هشام الخيرية — نزرع الأمل ونصنع حياةً كريمة عبر برامج الإغاثة والصحة والتعليم.' }, home())))
-app.get('/about', (c) => html(page({ title: 'من نحن', active: 'about' }, about())))
-app.get('/campaigns', (c) => html(page({ title: 'الحملات', active: 'work' }, campaignsPage())))
-app.get('/achievements', (c) => html(page({ title: 'الإنجازات', active: 'work' }, achievementsPage())))
-app.get('/success-stories', (c) => html(page({ title: 'قصص النجاح', active: 'work' }, storiesPage())))
-app.get('/events', (c) => html(page({ title: 'الفعاليات', active: 'work' }, eventsPage())))
-app.get('/gallery', (c) => html(page({ title: 'معرض الصور', active: 'work' }, galleryPage())))
-app.get('/donate', (c) => html(page({ title: 'تبرّع الآن', active: 'join' }, donatePage())))
-app.get('/volunteers', (c) => html(page({ title: 'التطوّع', active: 'join' }, volunteersPage())))
-app.get('/careers', (c) => html(page({ title: 'الوظائف', active: 'join' }, careersPage())))
-app.get('/news', (c) => html(page({ title: 'الأخبار', active: 'news' }, newsPage())))
-app.get('/transparency', (c) => html(page({ title: 'الشفافية المالية', active: 'more' }, transparencyPage())))
-app.get('/faq', (c) => html(page({ title: 'الأسئلة الشائعة', active: 'more' }, faqPage())))
-app.get('/contact', (c) => html(page({ title: 'تواصل معنا', active: 'more' }, contactPage())))
+app.get('/', (c) => c.html(page({ title: 'الرئيسية', active: 'home', desc: 'مؤسسة الدكتور عمر هشام الخيرية — نزرع الأمل ونصنع حياةً كريمة عبر برامج الإغاثة والصحة والتعليم.' }, home())))
+app.get('/about', (c) => c.html(page({ title: 'من نحن', active: 'about' }, about())))
+app.get('/campaigns', (c) => c.html(page({ title: 'الحملات', active: 'work' }, campaignsPage())))
+app.get('/achievements', (c) => c.html(page({ title: 'الإنجازات', active: 'work' }, achievementsPage())))
+app.get('/success-stories', (c) => c.html(page({ title: 'قصص النجاح', active: 'work' }, storiesPage())))
+app.get('/events', (c) => c.html(page({ title: 'الفعاليات', active: 'work' }, eventsPage())))
+app.get('/gallery', (c) => c.html(page({ title: 'معرض الصور', active: 'work' }, galleryPage())))
+app.get('/donate', (c) => c.html(page({ title: 'تبرّع الآن', active: 'join' }, donatePage())))
+app.get('/volunteers', (c) => c.html(page({ title: 'التطوّع', active: 'join' }, volunteersPage())))
+app.get('/careers', (c) => c.html(page({ title: 'الوظائف', active: 'join' }, careersPage())))
+app.get('/news', (c) => c.html(page({ title: 'الأخبار', active: 'news' }, newsPage())))
+app.get('/transparency', (c) => c.html(page({ title: 'الشفافية المالية', active: 'more' }, transparencyPage())))
+app.get('/faq', (c) => c.html(page({ title: 'الأسئلة الشائعة', active: 'more' }, faqPage())))
+app.get('/contact', (c) => c.html(page({ title: 'تواصل معنا', active: 'more' }, contactPage())))
 
 // Standalone-layout pages
-app.get('/dashboard', (c) => html(dashboardPage()))
-app.get('/login', (c) => html(loginPage()))
-app.get('/register', (c) => html(registerPage()))
+app.get('/dashboard', (c) => c.html(dashboardPage()))
+app.get('/login', (c) => c.html(loginPage()))
+app.get('/register', (c) => c.html(registerPage()))
 
 // 404
-app.notFound((c) => html(page({ title: 'الصفحة غير موجودة' }, `
+app.notFound((c) => c.html(page({ title: 'الصفحة غير موجودة' }, `
 <section class="page-hero" style="min-height:70vh;display:grid;place-items:center">
   <div class="hero-bg-grid"></div><div class="hero-glow g1"></div><div class="hero-glow g3"></div>
   <div class="wrap center" style="position:relative;z-index:3">
