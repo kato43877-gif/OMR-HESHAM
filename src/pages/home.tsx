@@ -13,9 +13,9 @@ export const home = ({ campaigns = [], news = [], stories = [], stats = { total_
   <div class="hero-glow g3"></div>
   <div class="wrap-wide">
     <div class="hero-copy">
-      <span class="hero-badge reveal"><span class="dot"></span> العطاء بإيمان · الإحسان للجميع</span>
-      <h1 class="display reveal d1">نزرع الأمل،<br>ونصنع <span class="accent">حياةً كريمة</span></h1>
-      <p class="lead reveal d2">مؤسسة الدكتور عمر هشام الخيرية — رسالة إنسانية تمتد لتُغيث المحتاج، وتُداوي المريض، وتُعلّم النشء، وتُمكّن الأسر. معًا نحوّل التبرّع إلى أثرٍ يدوم.</p>
+      <span class="hero-badge reveal"><span class="dot"></span> عطاء مستمر... لتنمية الإنسان والمجتمع</span>
+      <h1 class="display reveal d1">العطاء بإيمان<br>والإحسان <span class="accent">للجميع</span></h1>
+      <p class="lead reveal d2">مؤسسة الدكتور عمر هشام الخيرية — عطاء مستمر لتنمية الإنسان والمجتمع. نعمل في الدعم الصحي وإطعام الطعام ومسابقات القرآن الكريم والتعليم والمشاريع المجتمعية. معاً نصنع الأمل.</p>
       <div class="hero-actions reveal d3">
         <a href="/donate" class="btn btn-gold btn-lg magnetic"><i class="fas fa-hand-holding-heart"></i> ابدأ عطاءك</a>
         <a href="/about" class="btn btn-outline-light btn-lg"><i class="fas fa-circle-play"></i> تعرّف علينا</a>
@@ -79,8 +79,8 @@ export const home = ({ campaigns = [], news = [], stories = [], stats = { total_
         </div>
         <div class="stat-item">
           <i class="fas fa-globe"></i>
-          <div class="num"><span data-count="14">0</span></div>
-          <div class="lbl">محافظة نخدمها</div>
+          <div class="num"><span data-count="1">0</span></div>
+          <div class="lbl">كفر العنانية</div>
         </div>
       </div>
     </div>
@@ -120,8 +120,8 @@ export const home = ({ campaigns = [], news = [], stories = [], stats = { total_
       </div>
       <div class="reveal d1">
         <span class="eyebrow">من نحن</span>
-        <h2 class="h-xl" style="margin:.8rem 0 1rem">رسالةٌ إنسانية<br>تنبع من <span class="text-grad-emerald">القلب</span></h2>
-        <p class="lead" style="margin-bottom:1.6rem">انطلقت المؤسسة برؤية الدكتور عمر هشام لتكون جسرًا بين المُحسن والمحتاج، تعمل بأمانةٍ وشفافيةٍ لإحداث أثرٍ حقيقي ومستدام في حياة الناس.</p>
+        <h2 class="h-xl" style="margin:.8rem 0 1rem">رسالةٌ إنسانية<br>تنبع من <span class="text-grad-emerald">الإيمان</span></h2>
+        <p class="lead" style="margin-bottom:1.6rem">مؤسسة الدكتور عمر هشام الخيرية بكفر العنانية، تعمل على تنمية الإنسان والمجتمع عبر مشروع الأضاحي وإطعام الطعام والدعم الصحي ومسابقات القرآن الكريم ودعم التعليم والمشاريع المجتمعية.</p>
         <ul class="feature-list">
           <li><span class="fi ic-emerald"><i class="fas fa-bullseye"></i></span><div><b>رؤية واضحة</b><p>مجتمع متكافل لا يُترك فيه محتاجٌ دون عون.</p></div></li>
           <li><span class="fi ic-blue"><i class="fas fa-route"></i></span><div><b>منهج مؤسسي</b><p>إجراءات دقيقة تضمن وصول الدعم لمستحقيه.</p></div></li>

@@ -69,10 +69,9 @@ export const nav = (active = '', user?: any) => {
   return `
   <div class="topbar">
     <div class="wrap">
-      <div class="tb-left"><i class="fas fa-location-dot"></i> القاهرة، جمهورية مصر العربية &nbsp;·&nbsp; <i class="fas fa-clock"></i> السبت – الخميس ٩ص – ٥م</div>
+      <div class="tb-left"><i class="fas fa-location-dot"></i> كفر العنانية &nbsp;·&nbsp; <i class="fas fa-clock"></i> السبت – الخميس ٩ص – ٥م</div>
       <div class="tb-right">
-        <a href="#"><i class="fas fa-phone"></i> يتم التحديث</a>
-        <a href="#"><i class="fas fa-envelope"></i> يتم التحديث</a>
+        <a href="tel:01060920249"><i class="fas fa-phone"></i> 01060920249</a>
         ${user ? 
           `<a href="/profile" style="font-weight:700;color:var(--brand-gold)"><i class="fas fa-user-circle"></i> حسابي</a>`
         : 
@@ -134,7 +133,7 @@ export const footer = () => `
           <img src="${LOGO}" alt="الشعار">
           <span class="brand-txt"><b>مؤسسة د. عمر هشام</b><span>الخيرية</span></span>
         </a>
-        <p style="margin-top:1.2rem;max-width:320px">مؤسسة خيرية إنسانية تعمل على إغاثة المحتاجين، وتمكين الأسر، ونشر العلم والصحة بروح الإيمان والإحسان منذ تأسيسها.</p>
+        <p style="margin-top:1.2rem;max-width:320px">مؤسسة خيرية إنسانية تعمل على إغاثة المحتاجين، ودعم المرضى، ونشر العلم، وتحفيظ القرآن الكريم بروح الإيمان والإحسان. مقرنا الرئيسي: كفر العنانية.</p>
         <div class="social">
           <a href="#" aria-label="فيسبوك"><i class="fab fa-facebook-f"></i></a>
           <a href="#" aria-label="إكس"><i class="fab fa-x-twitter"></i></a>
