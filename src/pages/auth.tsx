@@ -37,37 +37,23 @@ const shell = (title: string, body: string) => `<!DOCTYPE html>
 </html>`
 
 export const loginPage = () => shell('تسجيل الدخول', `
-  <h1 class="h-lg" style="margin-bottom:.4rem">أهلاً بعودتك 👋</h1>
-  <p style="color:var(--muted);margin-bottom:2rem">سجّل دخولك لمتابعة حسابك وأثرك.</p>
-  <form data-redirect="/dashboard">
-    <div class="field"><label>البريد الإلكتروني</label><input type="email" required placeholder="email@example.com"></div>
-    <div class="field"><label>كلمة المرور</label><input type="password" required placeholder="••••••••"></div>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.4rem">
-      <label style="display:flex;gap:.5rem;align-items:center;font-size:.9rem;font-weight:600"><input type="checkbox" style="width:auto"> تذكّرني</label>
-      <a href="#" style="color:var(--blue-700);font-weight:700;font-size:.9rem">نسيت كلمة المرور؟</a>
+  <h1 class="h-lg" style="margin-bottom:.4rem">أهلاً بك في المؤسسة 👋</h1>
+  <p style="color:var(--muted);margin-bottom:2rem">سجّل دخولك لمتابعة أثرك أو تابع كضيف.</p>
+  
+  <div style="display:flex;flex-direction:column;gap:1rem">
+    <a href="/api/auth/google" class="btn btn-primary btn-block btn-lg magnetic" style="display:flex;align-items:center;justify-content:center;gap:.8rem;background:#fff;color:#333;border:1px solid #ddd">
+      <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style="width:24px;height:24px">
+      تسجيل الدخول بواسطة Google
+    </a>
+    
+    <div style="display:flex;align-items:center;gap:1rem;margin:1rem 0;color:var(--muted)">
+      <span style="flex:1;height:1px;background:var(--ink-100)"></span> 
+      أو 
+      <span style="flex:1;height:1px;background:var(--ink-100)"></span>
     </div>
-    <button type="submit" class="btn btn-primary btn-block btn-lg magnetic"><i class="fas fa-right-to-bracket"></i> تسجيل الدخول</button>
-  </form>
-  <div style="display:flex;align-items:center;gap:1rem;margin:1.6rem 0;color:var(--muted)"><span style="flex:1;height:1px;background:var(--ink-100)"></span> أو <span style="flex:1;height:1px;background:var(--ink-100)"></span></div>
-  <div class="grid cols-2" style="gap:.7rem">
-    <button class="btn btn-ghost"><i class="fab fa-google"></i> Google</button>
-    <button class="btn btn-ghost"><i class="fab fa-facebook-f"></i> Facebook</button>
+    
+    <a href="/dashboard" class="btn btn-ghost btn-block btn-lg">
+      <i class="fas fa-user-astronaut"></i> المتابعة كضيف
+    </a>
   </div>
-  <p class="center" style="margin-top:1.8rem;color:var(--muted)">ليس لديك حساب؟ <a href="/register" style="color:var(--blue-700);font-weight:800">أنشئ حسابًا</a></p>
-`)
-
-export const registerPage = () => shell('إنشاء حساب', `
-  <h1 class="h-lg" style="margin-bottom:.4rem">أنشئ حسابك ✨</h1>
-  <p style="color:var(--muted);margin-bottom:2rem">انضمّ إلى مجتمع العطاء في دقائق.</p>
-  <form data-redirect="/dashboard">
-    <div class="field"><label>الاسم الكامل</label><input required placeholder="اسمك الكريم"></div>
-    <div class="field"><label>البريد الإلكتروني</label><input type="email" required placeholder="email@example.com"></div>
-    <div class="grid cols-2" style="gap:0 1rem">
-      <div class="field"><label>الجوال</label><input required placeholder="01xxxxxxxxx"></div>
-      <div class="field"><label>كلمة المرور</label><input type="password" required placeholder="••••••••"></div>
-    </div>
-    <label style="display:flex;gap:.5rem;align-items:flex-start;font-size:.88rem;font-weight:600;margin-bottom:1.4rem"><input type="checkbox" required style="width:auto;margin-top:.3rem"> أوافق على <a href="/transparency" style="color:var(--blue-700)">الشروط والأحكام</a> وسياسة الخصوصية</label>
-    <button type="submit" class="btn btn-primary btn-block btn-lg magnetic"><i class="fas fa-user-plus"></i> إنشاء الحساب</button>
-  </form>
-  <p class="center" style="margin-top:1.8rem;color:var(--muted)">لديك حساب بالفعل؟ <a href="/login" style="color:var(--blue-700);font-weight:800">سجّل الدخول</a></p>
 `)

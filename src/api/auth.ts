@@ -3,70 +3,39 @@ import { getSupabaseFromContext } from '../lib/supabase'
 
 export const auth = new Hono()
 
-auth.post('/register', async (c) => {
+auth.get('/google', async (c) => {
   const supabase = getSupabaseFromContext(c)
-  const body = await c.req.json()
-  const { email, password, fullName, phone } = body
+  
+  // Create a redirect URL that points to our callback route
+  const redirectUrl = new URL('/api/auth/callback', new URL(c.req.url).origin).href
 
-  if (!email || !password || !fullName) {
-    return c.json({ error: 'Missing required fields' }, 400)
-  }
-
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
     options: {
-      data: {
-        full_name: fullName,
-        phone: phone || '',
-      }
+      redirectTo: redirectUrl
     }
   })
 
-  if (error) return c.json({ error: error.message }, 400)
-
-  // Assuming we need to manually insert into profiles due to RLS, or Supabase trigger handles it.
-  // It is best practice to have a trigger in Supabase on auth.users to create the profile,
-  // but if we don't, we can do it here. Let's do it here just in case.
-  if (data.user) {
-    await supabase.from('profiles').insert({
-      id: data.user.id,
-      full_name: fullName,
-      phone: phone || '',
-      role: 'donor'
-    })
+  if (error || !data.url) {
+    console.error('Google OAuth error:', error?.message)
+    return c.redirect('/login?error=oauth_failed')
   }
 
-  return c.json({ data })
+  // Redirect the user to Google's consent screen
+  return c.redirect(data.url)
 })
 
-auth.post('/login', async (c) => {
-  const supabase = getSupabaseFromContext(c)
-  const body = await c.req.json()
-  const { email, password } = body
-
-  if (!email || !password) {
-    return c.json({ error: 'Missing email or password' }, 400)
-  }
-
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password
-  })
-
-  if (error) return c.json({ error: error.message }, 400)
-  
-  return c.json({ data })
+auth.get('/callback', async (c) => {
+  // Since we are using standard supabase-js without an SSR package setup for cookies,
+  // the callback will actually be handled by Supabase and the hash fragment will 
+  // be sent to the browser. However, for a simple implementation, if the code 
+  // query param exists, we can try to exchange it. 
+  // In typical Supabase setups without SSR, we just redirect to the dashboard.
+  return c.redirect('/dashboard')
 })
 
-auth.post('/logout', async (c) => {
-  const supabase = getSupabaseFromContext(c)
-  const authHeader = c.req.header('Authorization')
-  
-  if (authHeader) {
-    const token = authHeader.replace('Bearer ', '')
-    await supabase.auth.admin.signOut(token)
-  }
-  
-  return c.json({ message: 'Logged out successfully' })
+auth.get('/logout', async (c) => {
+  // Since session is managed client-side or implicitly in this setup,
+  // we just redirect to the home page or login page
+  return c.redirect('/login')
 })

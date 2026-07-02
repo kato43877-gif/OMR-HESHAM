@@ -25,7 +25,7 @@ import { dashNews } from './pages/dashboard/news'
 import { dashEvents } from './pages/dashboard/events'
 import { dashStories } from './pages/dashboard/stories'
 import { dashJobs } from './pages/dashboard/jobs'
-import { loginPage, registerPage } from './pages/auth'
+import { loginPage } from './pages/auth'
 
 const app = new Hono()
 
@@ -158,7 +158,6 @@ app.get('/dashboard/jobs', async (c) => {
   return c.html(dashJobs(jobs || [], apps || []))
 })
 app.get('/login', (c) => c.html(loginPage()))
-app.get('/register', (c) => c.html(registerPage()))
 
 // 404
 app.notFound((c) => c.html(page({ title: 'الصفحة غير موجودة' }, `
