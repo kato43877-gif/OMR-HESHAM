@@ -41,11 +41,19 @@ app.use('*', async (c, next) => {
   if (token) {
     try {
       const payload = JSON.parse(atob(token.split('.')[1]))
+      let role = 'user'
+      try {
+        const supabase = getSupabaseFromContext(c)
+        const { data } = await supabase.from('profiles').select('role').eq('id', payload.sub).single()
+        if (data?.role) role = data.role
+      } catch(err) {}
+
       ;(c as any).set('user', {
         id: payload.sub,
         email: payload.email,
         name: payload.user_metadata?.full_name || payload.email,
-        avatar: payload.user_metadata?.avatar_url
+        avatar: payload.user_metadata?.avatar_url,
+        role
       })
     } catch(e) {}
   }
@@ -87,12 +95,15 @@ app.get('/events', async (c) => {
 })
 app.get('/gallery', (c) => c.html(page({ user: (c as any).get('user'), title: 'معرض الصور', active: 'work' }, galleryPage())))
 app.get('/donate', (c) => c.html(page({ user: (c as any).get('user'), title: 'تبرّع الآن', active: 'join' }, donatePage())))
-app.get('/volunteers', (c) => c.html(page({ user: (c as any).get('user'), title: 'التطوّع', active: 'join' }, volunteersPage())))
+app.get('/volunteers', (c) => c.html(page({ user: (c as any).get('user'), title: 'التطوّع', active: 'join' }, volunteersPage(c.req.query('success') === '1'))))
+
 app.get('/careers', async (c) => {
   const supabase = getSupabaseFromContext(c)
   const { data: jobs } = await supabase.from('jobs').select('*').eq('is_active', true).order('created_at', { ascending: false })
-  return c.html(page({ user: (c as any).get('user'), title: 'الوظائف', active: 'join' }, careersPage(jobs || [])))
+  return c.html(page({ user: (c as any).get('user'), title: 'الوظائف', active: 'join' }, careersPage(jobs || [], c.req.query('success') === '1')))
 })
+
+
 app.get('/news', async (c) => {
   const supabase = getSupabaseFromContext(c)
   const { data: news } = await supabase.from('news').select('*').order('publish_date', { ascending: false })
@@ -126,7 +137,9 @@ app.get('/profile', async (c) => {
   return c.html(page({ user: sessionUser, title: 'حسابي الشخصي' }, profilePage(sessionUser, donations || [], volunteers?.[0])))
 })
 app.get('/faq', (c) => c.html(page({ user: (c as any).get('user'), title: 'الأسئلة الشائعة', active: 'more' }, faqPage())))
-app.get('/contact', (c) => c.html(page({ user: (c as any).get('user'), title: 'تواصل معنا', active: 'more' }, contactPage())))
+app.get('/contact', (c) => c.html(page({ user: (c as any).get('user'), title: 'تواصل معنا', active: 'more' }, contactPage(c.req.query('success') === '1'))))
+
+
 
 // Dashboard Protection Middleware
 const dashboardGuard = async (c: any, next: any) => {

@@ -86,7 +86,14 @@ export const nav = (active = '', user?: any) => {
         <img src="${LOGO}" alt="شعار مؤسسة الدكتور عمر هشام الخيرية">
         <span class="brand-txt"><b>مؤسسة د. عمر هشام</b><span>الخيرية · العطاء بإيمان</span></span>
       </a>
-      <ul class="nav-links">${NAV.map(link).join('')}</ul>
+      <ul class="nav-links">${NAV.map((n: any) => {
+        if (n.key === 'more') {
+          const isAdmin = user?.role === 'admin'
+          const children = n.children.filter((c: any) => c.href !== '/dashboard' || isAdmin)
+          return link({ ...n, children })
+        }
+        return link(n)
+      }).join('')}</ul>
       <div class="nav-cta">
         <button class="theme-btn" id="themeToggle" title="تبديل المظهر" aria-label="تبديل المظهر"><i class="fas fa-moon"></i></button>
         <button class="lang-btn" id="langToggle" title="English">EN</button>
@@ -117,13 +124,20 @@ export const nav = (active = '', user?: any) => {
       <a href="/transparency">الشفافية المالية</a>
       <a href="/faq">الأسئلة الشائعة</a>
       <a href="/contact">تواصل معنا</a>
-      <a href="/dashboard">لوحة التحكم</a>
+      ${user?.role === 'admin' ? '<a href="/dashboard">لوحة التحكم</a>' : ''}
       <a href="/donate" class="btn btn-gold btn-block" style="margin-top:1.2rem"><i class="fas fa-hand-holding-heart"></i> تبرّع الآن</a>
     </div>
   </div>`
 }
 
-export const footer = () => `
+export const footer = (active = '') => {
+  const fabAndToTop = `
+<a href="#" class="totop" id="toTop" aria-label="إلى الأعلى"><i class="fas fa-arrow-up"></i></a>
+<div class="fab"><a href="/donate" class="btn btn-gold magnetic"><i class="fas fa-heart"></i> تبرّع</a></div>
+`
+  if (active !== 'home') return fabAndToTop
+
+  return `
 <footer class="footer">
   <div class="footer-glow"></div>
   <div class="wrap-wide">
@@ -134,13 +148,6 @@ export const footer = () => `
           <span class="brand-txt"><b>مؤسسة د. عمر هشام</b><span>الخيرية</span></span>
         </a>
         <p style="margin-top:1.2rem;max-width:320px">مؤسسة خيرية إنسانية تعمل على إغاثة المحتاجين، ودعم المرضى، ونشر العلم، وتحفيظ القرآن الكريم بروح الإيمان والإحسان. مقرنا الرئيسي: كفر العنانية.</p>
-        <div class="social">
-          <a href="#" aria-label="فيسبوك"><i class="fab fa-facebook-f"></i></a>
-          <a href="#" aria-label="إكس"><i class="fab fa-x-twitter"></i></a>
-          <a href="#" aria-label="إنستغرام"><i class="fab fa-instagram"></i></a>
-          <a href="#" aria-label="يوتيوب"><i class="fab fa-youtube"></i></a>
-          <a href="#" aria-label="لينكدإن"><i class="fab fa-linkedin-in"></i></a>
-        </div>
       </div>
       <div>
         <h4>روابط سريعة</h4>
@@ -165,8 +172,8 @@ export const footer = () => `
       <div>
         <h4>النشرة البريدية</h4>
         <p>اشترك ليصلك جديد المؤسسة وحملاتها الإنسانية.</p>
-        <form class="footer-newsletter" data-toast="تم اشتراكك في النشرة. شكرًا لك 💚">
-          <input type="email" placeholder="بريدك الإلكتروني" required aria-label="البريد الإلكتروني">
+        <form action="/api/newsletter" method="POST" class="footer-newsletter">
+          <input type="email" name="email" placeholder="بريدك الإلكتروني" required aria-label="البريد الإلكتروني">
           <button class="btn btn-primary btn-sm" type="submit"><i class="fas fa-paper-plane"></i></button>
         </form>
         <div class="chip chip-emerald" style="margin-top:1rem"><i class="fas fa-shield-halved"></i> جهة مرخّصة ومعتمدة</div>
@@ -182,10 +189,9 @@ export const footer = () => `
     </div>
   </div>
 </footer>
-
-<a href="#" class="totop" id="toTop" aria-label="إلى الأعلى"><i class="fas fa-arrow-up"></i></a>
-<div class="fab"><a href="/donate" class="btn btn-gold magnetic"><i class="fas fa-heart"></i> تبرّع</a></div>
+${fabAndToTop}
 `
+}
 
 // Wraps page content in full HTML document
 export const page = (opts: PageOpts, content: string) => `<!DOCTYPE html>
@@ -204,7 +210,7 @@ export const page = (opts: PageOpts, content: string) => `<!DOCTYPE html>
   ${preloader()}
   ${nav(opts.active, opts.user)}
   <main>${content}</main>
-  ${footer()}
+  ${footer(opts.active)}
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="/static/app.js"></script>
 </body>

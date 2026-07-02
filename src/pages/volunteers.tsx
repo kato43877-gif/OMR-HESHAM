@@ -1,6 +1,6 @@
 import { pageHero, ctaBanner } from '../layout'
 
-export const volunteersPage = () => pageHero(
+export const volunteersPage = (success = false) => pageHero(
   'كن متطوّعًا معنا',
   'وقتك ومهاراتك هدايا لا تُقدّر بثمن. انضمّ إلى أسرة المتطوّعين وكن جزءًا من صناعة الأثر.',
   'التطوّع'
@@ -46,19 +46,20 @@ export const volunteersPage = () => pageHero(
       </div>
       <div class="form-card reveal d1">
         <h3 class="h-lg" style="margin-bottom:1.2rem">استمارة التطوّع</h3>
-        <form data-toast="شكرًا لك! استلمنا طلبك وسنتواصل معك قريبًا 🤝">
+        ${success ? '<div style="background:var(--emerald-600);color:#fff;padding:1rem;border-radius:.5rem;margin-bottom:1.5rem;text-align:center;font-weight:700"><i class="fas fa-check-circle"></i> شكرًا لك! تم تسجيل طلبك بنجاح وسنتواصل معك قريبًا.</div>' : ''}
+        <form action="/api/volunteers" method="POST">
           <div class="grid cols-2" style="gap:0 1rem">
-            <div class="field"><label>الاسم <span class="req">*</span></label><input required placeholder="اسمك الكامل"></div>
-            <div class="field"><label>العمر</label><input type="number" placeholder="العمر"></div>
+            <div class="field"><label>الاسم <span class="req">*</span></label><input name="full_name" required placeholder="اسمك الكامل"></div>
+            <div class="field"><label>العمر</label><input name="age" type="number" placeholder="العمر"></div>
           </div>
           <div class="grid cols-2" style="gap:0 1rem">
-            <div class="field"><label>الجوال <span class="req">*</span></label><input required placeholder="01xxxxxxxxx"></div>
-            <div class="field"><label>المدينة</label><input placeholder="المحافظة / المدينة"></div>
+            <div class="field"><label>الجوال <span class="req">*</span></label><input name="phone" required placeholder="01xxxxxxxxx"></div>
+            <div class="field"><label>المدينة</label><input name="city" placeholder="المحافظة / المدينة"></div>
           </div>
           <div class="field"><label>مجال التطوّع المفضّل</label>
-            <select><option>التطوّع الميداني</option><option>التطوّع الطبي</option><option>التطوّع الرقمي</option><option>التطوّع التعليمي</option><option>التوعية والحملات</option><option>رعاية الأسر</option></select>
+            <select name="preferred_role"><option>التطوّع الميداني</option><option>التطوّع الطبي</option><option>التطوّع الرقمي</option><option>التطوّع التعليمي</option><option>التوعية والحملات</option><option>رعاية الأسر</option></select>
           </div>
-          <div class="field"><label>أوقات إتاحتك ومهاراتك</label><textarea placeholder="أخبرنا عن مهاراتك والأوقات التي تستطيع التطوّع فيها"></textarea></div>
+          <div class="field"><label>أوقات إتاحتك ومهاراتك</label><textarea name="skills" placeholder="أخبرنا عن مهاراتك والأوقات التي تستطيع التطوّع فيها"></textarea></div>
           <button type="submit" class="btn btn-primary btn-block btn-lg magnetic"><i class="fas fa-hands-helping"></i> أرسل طلب التطوّع</button>
         </form>
       </div>

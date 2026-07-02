@@ -1,6 +1,6 @@
 import { pageHero } from '../layout'
 
-export const contactPage = () => pageHero(
+export const contactPage = (success = false) => pageHero(
   'تواصل معنا',
   'نحن هنا لسماعك. سواء كان لديك استفسار، اقتراح، أو رغبة في الشراكة — لا تتردّد في مراسلتنا.',
   'تواصل معنا'
@@ -23,16 +23,17 @@ export const contactPage = () => pageHero(
       <div class="form-card reveal-x">
         <h2 class="h-lg" style="margin-bottom:.4rem">أرسل لنا رسالة</h2>
         <p style="color:var(--muted);margin-bottom:1.6rem">سنردّ عليك خلال ٢٤–٤٨ ساعة عمل.</p>
-        <form data-toast="تم إرسال رسالتك بنجاح، شكرًا لتواصلك 💌">
+        ${success ? '<div style="background:var(--emerald-600);color:#fff;padding:1rem;border-radius:.5rem;margin-bottom:1.5rem;text-align:center;font-weight:700"><i class="fas fa-check-circle"></i> تم إرسال رسالتك بنجاح، شكرًا لتواصلك 💌</div>' : ''}
+        <form action="/api/contact" method="POST">
           <div class="grid cols-2" style="gap:0 1rem">
-            <div class="field"><label>الاسم <span class="req">*</span></label><input required placeholder="اسمك الكريم"></div>
-            <div class="field"><label>البريد <span class="req">*</span></label><input type="email" required placeholder="email@example.com"></div>
+            <div class="field"><label>الاسم <span class="req">*</span></label><input name="name" required placeholder="اسمك الكريم"></div>
+            <div class="field"><label>البريد <span class="req">*</span></label><input name="email" type="email" required placeholder="email@example.com"></div>
           </div>
           <div class="grid cols-2" style="gap:0 1rem">
-            <div class="field"><label>الجوال</label><input placeholder="01xxxxxxxxx"></div>
-            <div class="field"><label>الموضوع</label><select><option>استفسار عام</option><option>شراكة</option><option>شكوى أو اقتراح</option><option>إعلام وصحافة</option></select></div>
+            <div class="field"><label>الجوال</label><input name="phone" placeholder="01xxxxxxxxx"></div>
+            <div class="field"><label>الموضوع</label><select name="subject"><option>استفسار عام</option><option>شراكة</option><option>شكوى أو اقتراح</option><option>إعلام وصحافة</option></select></div>
           </div>
-          <div class="field"><label>رسالتك <span class="req">*</span></label><textarea required placeholder="اكتب رسالتك هنا..."></textarea></div>
+          <div class="field"><label>رسالتك <span class="req">*</span></label><textarea name="message" required placeholder="اكتب رسالتك هنا..."></textarea></div>
           <button type="submit" class="btn btn-primary btn-block btn-lg magnetic"><i class="fas fa-paper-plane"></i> إرسال الرسالة</button>
         </form>
       </div>

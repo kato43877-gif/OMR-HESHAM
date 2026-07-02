@@ -8,6 +8,7 @@ import { news } from './news'
 import { events } from './events'
 import { stories } from './stories'
 import { jobs } from './jobs'
+import { newsletter } from './newsletter'
 
 const api = new Hono()
 
@@ -20,5 +21,6 @@ api.route('/news', news)
 api.route('/events', events)
 api.route('/stories', stories)
 api.route('/jobs', jobs)
+api.route('/newsletter', newsletter)
 
 export { api }

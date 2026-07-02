@@ -1,6 +1,6 @@
 import { pageHero, ctaBanner } from '../layout'
 
-export const careersPage = (jobs: any[] = []) => pageHero(
+export const careersPage = (jobs: any[] = [], success = false) => pageHero(
   'انضمّ إلى فريقنا',
   'ابنِ مسيرتك المهنية في بيئةٍ ملهمة، واجعل عملك اليومي رسالةً إنسانية تترك أثرًا.',
   'الوظائف'
@@ -62,17 +62,18 @@ export const careersPage = (jobs: any[] = []) => pageHero(
         <h2 class="h-lg">قدّم طلبك</h2>
         <p style="color:var(--muted)">املأ النموذج وأرفق سيرتك الذاتية وسنتواصل معك.</p>
       </div>
-      <form data-toast="تم استلام طلبك بنجاح، سنتواصل معك قريبًا 📩">
+      ${success ? '<div style="background:var(--emerald-600);color:#fff;padding:1rem;border-radius:.5rem;margin-bottom:1.5rem;text-align:center;font-weight:700"><i class="fas fa-check-circle"></i> تم استلام طلبك بنجاح، سنتواصل معك قريبًا 📩</div>' : ''}
+      <form action="/api/jobs/apply" method="POST">
         <div class="grid cols-2" style="gap:0 1rem">
-          <div class="field"><label>الاسم الكامل <span class="req">*</span></label><input required placeholder="اسمك"></div>
-          <div class="field"><label>البريد <span class="req">*</span></label><input type="email" required placeholder="email@example.com"></div>
+          <div class="field"><label>الاسم الكامل <span class="req">*</span></label><input name="full_name" required placeholder="اسمك"></div>
+          <div class="field"><label>البريد <span class="req">*</span></label><input name="email" type="email" required placeholder="email@example.com"></div>
         </div>
         <div class="grid cols-2" style="gap:0 1rem">
-          <div class="field"><label>الجوال <span class="req">*</span></label><input required placeholder="01xxxxxxxxx"></div>
-          <div class="field"><label>الوظيفة المتقدّم لها</label><select>${jobs.map(j => `<option value="${j.id}">${j.title}</option>`).join('')}</select></div>
+          <div class="field"><label>الجوال <span class="req">*</span></label><input name="phone" required placeholder="01xxxxxxxxx"></div>
+          <div class="field"><label>الوظيفة المتقدّم لها</label><select name="job_id">${jobs.map(j => `<option value="${j.id}">${j.title}</option>`).join('')}</select></div>
         </div>
-        <div class="field"><label>نبذة عنك</label><textarea placeholder="أخبرنا عن خبراتك ولماذا ترغب بالانضمام إلينا"></textarea></div>
-        <div class="field"><label>السيرة الذاتية (PDF)</label><input type="file" accept=".pdf,.doc,.docx"></div>
+        <div class="field"><label>نبذة عنك</label><textarea name="bio" placeholder="أخبرنا عن خبراتك ولماذا ترغب بالانضمام إلينا"></textarea></div>
+        <div class="field"><label>السيرة الذاتية (رابط)</label><input type="url" name="cv_url" placeholder="رابط Google Drive أو LinkedIn"></div>
         <button type="submit" class="btn btn-primary btn-block btn-lg magnetic"><i class="fas fa-paper-plane"></i> إرسال الطلب</button>
       </form>
     </div>

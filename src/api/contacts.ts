@@ -3,14 +3,25 @@ import { getSupabaseFromContext } from '../lib/supabase'
 
 export const contacts = new Hono()
 
-// Submit a contact message
+// Submit a contact message (accepts form data from browser)
 contacts.post('/', async (c) => {
   const supabase = getSupabaseFromContext(c)
-  
-  const body = await c.req.json()
+
+  // Accept both JSON and form data
+  const contentType = c.req.header('content-type') || ''
+  let body: any
+  if (contentType.includes('application/json')) {
+    body = await c.req.json()
+  } else {
+    body = await c.req.parseBody()
+  }
+
   const { name, email, phone, subject, message } = body
 
   if (!name || !email || !message) {
+    if (!contentType.includes('application/json')) {
+      return c.redirect('/contact?error=missing_fields')
+    }
     return c.json({ error: 'Missing required fields' }, 400)
   }
 
@@ -26,6 +37,12 @@ contacts.post('/', async (c) => {
     }])
     .select()
     .single()
+
+  // If form submission, redirect back
+  if (!contentType.includes('application/json')) {
+    if (error) return c.redirect('/contact?error=1')
+    return c.redirect('/contact?success=1')
+  }
 
   if (error) return c.json({ error: error.message }, 400)
   return c.json({ data, message: 'Message sent successfully.' })
