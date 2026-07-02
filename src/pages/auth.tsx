@@ -22,9 +22,6 @@ const shell = (title: string, body: string) => `<!DOCTYPE html>
         </a>
         <h2 class="h-xl" style="color:#fff">العطاء بإيمان<br>والإحسان <span style="color:var(--gold-400)">للجميع</span></h2>
         <p class="lead" style="color:rgba(255,255,255,.8);margin-top:1rem">انضمّ إلى منصّتنا وكن جزءًا من رحلة الأثر الإنساني. تابع تبرّعاتك، وأنشطتك التطوّعية، وأثرك في مكانٍ واحد.</p>
-        <div style="display:flex;gap:2rem;margin-top:2.4rem">
-          <div><b style="display:block;font-size:1.8rem;color:#fff">٤٨ ألف+</b><span style="color:rgba(255,255,255,.65);font-size:.85rem">مستفيد</span></div>
-          <div><b style="display:block;font-size:1.8rem;color:#fff">١.٨ ألف+</b><span style="color:rgba(255,255,255,.65);font-size:.85rem">متطوّع</span></div>
         </div>
       </div>
     </div>
