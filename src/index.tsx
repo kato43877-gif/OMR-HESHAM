@@ -28,11 +28,29 @@ import { dashStories } from './pages/dashboard/stories'
 import { dashJobs } from './pages/dashboard/jobs'
 import { dashUsers } from './pages/dashboard/users'
 import { loginPage } from './pages/auth'
+import { profilePage } from './pages/profile'
 
 const app = new Hono()
 
 // Mount API routes
 app.route('/api', api)
+
+// Global middleware for UI user state
+app.use('*', async (c, next) => {
+  const token = getCookie(c, 'sb-access-token')
+  if (token) {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]))
+      ;(c as any).set('user', {
+        id: payload.sub,
+        email: payload.email,
+        name: payload.user_metadata?.full_name || payload.email,
+        avatar: payload.user_metadata?.avatar_url
+      })
+    } catch(e) {}
+  }
+  await next()
+})
 
 app.get('/', async (c) => {
   const supabase = getSupabaseFromContext(c)
@@ -48,41 +66,67 @@ app.get('/', async (c) => {
     supabase.from('stories').select('*').order('created_at', { ascending: false }).limit(3)
   ])
 
-  return c.html(page({ title: 'الرئيسية', active: 'home', desc: 'مؤسسة الدكتور عمر هشام الخيرية — نزرع الأمل ونصنع حياةً كريمة عبر برامج الإغاثة والصحة والتعليم.' }, home({ campaigns, news, stories })))
+  return c.html(page({ user: (c as any).get('user'), title: 'الرئيسية', active: 'home', desc: 'مؤسسة الدكتور عمر هشام الخيرية — نزرع الأمل ونصنع حياةً كريمة عبر برامج الإغاثة والصحة والتعليم.' }, home({ campaigns, news, stories })))
 })
-app.get('/about', (c) => c.html(page({ title: 'من نحن', active: 'about' }, about())))
+app.get('/about', (c) => c.html(page({ user: (c as any).get('user'), title: 'من نحن', active: 'about' }, about())))
 app.get('/campaigns', async (c) => {
   const supabase = getSupabaseFromContext(c)
   const { data: campaigns } = await supabase.from('campaigns').select('*').order('created_at', { ascending: false })
-  return c.html(page({ title: 'الحملات', active: 'work' }, campaignsPage(campaigns || [])))
+  return c.html(page({ user: (c as any).get('user'), title: 'الحملات', active: 'work' }, campaignsPage(campaigns || [])))
 })
-app.get('/achievements', (c) => c.html(page({ title: 'الإنجازات', active: 'work' }, achievementsPage())))
+app.get('/achievements', (c) => c.html(page({ user: (c as any).get('user'), title: 'الإنجازات', active: 'work' }, achievementsPage())))
 app.get('/success-stories', async (c) => {
   const supabase = getSupabaseFromContext(c)
   const { data: stories } = await supabase.from('stories').select('*').order('created_at', { ascending: false })
-  return c.html(page({ title: 'قصص النجاح', active: 'work' }, storiesPage(stories || [])))
+  return c.html(page({ user: (c as any).get('user'), title: 'قصص النجاح', active: 'work' }, storiesPage(stories || [])))
 })
 app.get('/events', async (c) => {
   const supabase = getSupabaseFromContext(c)
   const { data: events } = await supabase.from('events').select('*').order('event_date', { ascending: true })
-  return c.html(page({ title: 'الفعاليات', active: 'work' }, eventsPage(events || [])))
+  return c.html(page({ user: (c as any).get('user'), title: 'الفعاليات', active: 'work' }, eventsPage(events || [])))
 })
-app.get('/gallery', (c) => c.html(page({ title: 'معرض الصور', active: 'work' }, galleryPage())))
-app.get('/donate', (c) => c.html(page({ title: 'تبرّع الآن', active: 'join' }, donatePage())))
-app.get('/volunteers', (c) => c.html(page({ title: 'التطوّع', active: 'join' }, volunteersPage())))
+app.get('/gallery', (c) => c.html(page({ user: (c as any).get('user'), title: 'معرض الصور', active: 'work' }, galleryPage())))
+app.get('/donate', (c) => c.html(page({ user: (c as any).get('user'), title: 'تبرّع الآن', active: 'join' }, donatePage())))
+app.get('/volunteers', (c) => c.html(page({ user: (c as any).get('user'), title: 'التطوّع', active: 'join' }, volunteersPage())))
 app.get('/careers', async (c) => {
   const supabase = getSupabaseFromContext(c)
   const { data: jobs } = await supabase.from('jobs').select('*').eq('is_active', true).order('created_at', { ascending: false })
-  return c.html(page({ title: 'الوظائف', active: 'join' }, careersPage(jobs || [])))
+  return c.html(page({ user: (c as any).get('user'), title: 'الوظائف', active: 'join' }, careersPage(jobs || [])))
 })
 app.get('/news', async (c) => {
   const supabase = getSupabaseFromContext(c)
   const { data: news } = await supabase.from('news').select('*').order('publish_date', { ascending: false })
-  return c.html(page({ title: 'المركز الإعلامي', active: 'news' }, newsPage(news || [])))
+  return c.html(page({ user: (c as any).get('user'), title: 'المركز الإعلامي', active: 'news' }, newsPage(news || [])))
 })
-app.get('/transparency', (c) => c.html(page({ title: 'الشفافية المالية', active: 'more' }, transparencyPage())))
-app.get('/faq', (c) => c.html(page({ title: 'الأسئلة الشائعة', active: 'more' }, faqPage())))
-app.get('/contact', (c) => c.html(page({ title: 'تواصل معنا', active: 'more' }, contactPage())))
+app.get('/transparency', (c) => c.html(page({ user: (c as any).get('user'), title: 'الشفافية المالية', active: 'more' }, transparencyPage())))
+
+app.get('/profile', async (c) => {
+  const token = getCookie(c, 'sb-access-token')
+  if (!token) return c.redirect('/login')
+
+  const supabase = getSupabaseFromContext(c)
+  const { data: { user } } = await supabase.auth.getUser(token)
+  
+  if (!user) return c.redirect('/login')
+
+  const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
+
+  const [ { data: donations }, { data: volunteers } ] = await Promise.all([
+    supabase.from('donations').select('*').eq('profile_id', user.id).order('created_at', { ascending: false }),
+    supabase.from('volunteers').select('*').eq('profile_id', user.id).limit(1)
+  ])
+
+  const sessionUser = {
+    ...profile,
+    name: profile?.full_name,
+    avatar: profile?.avatar_url,
+    email: profile?.email
+  }
+
+  return c.html(page({ user: sessionUser, title: 'حسابي الشخصي' }, profilePage(sessionUser, donations || [], volunteers?.[0])))
+})
+app.get('/faq', (c) => c.html(page({ user: (c as any).get('user'), title: 'الأسئلة الشائعة', active: 'more' }, faqPage())))
+app.get('/contact', (c) => c.html(page({ user: (c as any).get('user'), title: 'تواصل معنا', active: 'more' }, contactPage())))
 
 // Dashboard Protection Middleware
 const dashboardGuard = async (c: any, next: any) => {
@@ -221,7 +265,7 @@ app.post('/api/users/:id/role', async (c) => {
 app.get('/login', (c) => c.html(loginPage()))
 
 // 404
-app.notFound((c) => c.html(page({ title: 'الصفحة غير موجودة' }, `
+app.notFound((c) => c.html(page({ user: (c as any).get('user'), title: 'الصفحة غير موجودة' }, `
 <section class="page-hero" style="min-height:70vh;display:grid;place-items:center">
   <div class="hero-bg-grid"></div><div class="hero-glow g1"></div><div class="hero-glow g3"></div>
   <div class="wrap center" style="position:relative;z-index:3">

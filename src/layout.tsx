@@ -5,6 +5,7 @@ export interface PageOpts {
   title: string
   active?: string
   desc?: string
+  user?: any
 }
 
 const LOGO = '/static/img/logo.png'
@@ -51,7 +52,7 @@ const NAV = [
   },
 ]
 
-export const nav = (active = '') => {
+export const nav = (active = '', user?: any) => {
   const link = (n: any) => {
     if (n.children) {
       return `
@@ -72,7 +73,11 @@ export const nav = (active = '') => {
       <div class="tb-right">
         <a href="#"><i class="fas fa-phone"></i> يتم التحديث</a>
         <a href="#"><i class="fas fa-envelope"></i> يتم التحديث</a>
-        <a href="/dashboard"><i class="fas fa-user-shield"></i> دخول الأعضاء</a>
+        ${user ? 
+          `<a href="/profile" style="font-weight:700;color:var(--brand-gold)"><i class="fas fa-user-circle"></i> حسابي</a>`
+        : 
+          `<a href="/login"><i class="fas fa-user-shield"></i> تسجيل الدخول</a>`
+        }
       </div>
     </div>
   </div>
@@ -198,7 +203,7 @@ export const page = (opts: PageOpts, content: string) => `<!DOCTYPE html>
 </head>
 <body data-page="${opts.active || ''}">
   ${preloader()}
-  ${nav(opts.active)}
+  ${nav(opts.active, opts.user)}
   <main>${content}</main>
   ${footer()}
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
