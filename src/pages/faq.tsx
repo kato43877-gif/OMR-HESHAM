@@ -23,7 +23,7 @@ export const faqPage = () => pageHero(
       <p class="lead" style="margin:.8rem auto 0;max-width:520px">فريق خدمة المتبرّعين جاهزٌ للإجابة على كل استفساراتك.</p>
       <div class="hero-actions">
         <a href="/contact" class="btn btn-gold btn-lg magnetic"><i class="fas fa-envelope"></i> تواصل معنا</a>
-        <a href="tel:+201000000000" class="btn btn-outline-light btn-lg"><i class="fas fa-phone"></i> اتصل بنا</a>
+        <a href="/contact" class="btn btn-outline-light btn-lg"><i class="fas fa-message"></i> أرسل رسالة</a>
       </div>
     </div>
   </div>

@@ -22,16 +22,16 @@ export const contactPage = (success = false, errorMsg: string | null = null) => 
     <div class="split" style="align-items:start">
       <div class="form-card reveal-x">
         <h2 class="h-lg" style="margin-bottom:.4rem">أرسل لنا رسالة</h2>
-        <p style="color:var(--muted);margin-bottom:1.6rem">سنردّ عليك خلال ٢٤–٤٨ ساعة عمل.</p>
+        <p style="color:var(--muted);margin-bottom:1.6rem">سنردّ عليك في أقرب وقت ممكن.</p>
         ${success ? '<div style="background:var(--emerald-600);color:#fff;padding:1rem;border-radius:.5rem;margin-bottom:1.5rem;text-align:center;font-weight:700"><i class="fas fa-check-circle"></i> تم إرسال رسالتك بنجاح، شكرًا لتواصلك 💌</div>' : ''}
         ${errorMsg ? `<div style="background:#e53935;color:#fff;padding:1rem;border-radius:.5rem;margin-bottom:1.5rem;text-align:center;font-weight:700"><i class="fas fa-exclamation-circle"></i> حدث خطأ: ${errorMsg}</div>` : ''}
-        <form action="/api/contact" method="POST">
+        <form action="/api/contacts" method="POST">
           <div class="grid cols-2" style="gap:0 1rem">
             <div class="field"><label>الاسم <span class="req">*</span></label><input name="name" required placeholder="اسمك الكريم"></div>
             <div class="field"><label>البريد <span class="req">*</span></label><input name="email" type="email" required placeholder="email@example.com"></div>
           </div>
           <div class="grid cols-2" style="gap:0 1rem">
-            <div class="field"><label>الجوال</label><input name="phone" placeholder="01xxxxxxxxx"></div>
+            <div class="field"><label>الجوال</label><input name="phone" placeholder="رقم التواصل"></div>
             <div class="field"><label>الموضوع</label><select name="subject"><option>استفسار عام</option><option>شراكة</option><option>شكوى أو اقتراح</option><option>إعلام وصحافة</option></select></div>
           </div>
           <div class="field"><label>رسالتك <span class="req">*</span></label><textarea name="message" required placeholder="اكتب رسالتك هنا..."></textarea></div>
@@ -45,7 +45,7 @@ export const contactPage = (success = false, errorMsg: string | null = null) => 
         </div>
         <div class="card" style="margin-top:1.4rem">
           <h3 style="margin-bottom:1rem"><i class="fas fa-clock" style="color:var(--blue-600)"></i> ساعات العمل</h3>
-          <div class="metric-row"><span>السبت – الخميس</span><b>٩ ص – ٥ م</b></div>
+          <div class="metric-row"><span>أيام العمل</span><b>متاحون لخدمتكم</b></div>
           <div class="metric-row"><span>الجمعة</span><b style="color:var(--crimson)">إجازة</b></div>
           <div class="social" style="margin-top:1.2rem">
             <a href="#" style="background:var(--cream);color:var(--ink-700)"><i class="fab fa-facebook-f"></i></a>

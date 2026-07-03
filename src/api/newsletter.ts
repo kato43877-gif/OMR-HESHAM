@@ -34,6 +34,10 @@ newsletter.post('/', async (c) => {
   if (!contentType.includes('application/json')) {
     const referer = c.req.header('referer') || '/'
     const separator = referer.includes('?') ? '&' : '?'
+    if (error) {
+      console.error('Newsletter subscription error:', error.message)
+      return c.redirect(referer + separator + 'news_error=1')
+    }
     return c.redirect(referer + separator + 'news_success=1')
   }
 

@@ -1,8 +1,5 @@
 import { pageHero, ctaBanner } from '../layout'
 
-const pct = (r: number, g: number) => Math.min(100, Math.round((r / g) * 100))
-const money = (n: number) => n.toLocaleString('ar-EG')
-
 export const campaignsPage = (campaigns: any[] = []) => pageHero(
   'حملاتنا الإنسانية',
   'اختر القضية التي تُلامس قلبك، وكن سببًا في تغيير حياة. كل حملة موثّقة وكل تبرّع يصل بأمانة.',
@@ -34,13 +31,8 @@ export const campaignsPage = (campaigns: any[] = []) => pageHero(
         <div class="campaign-body">
           <h3>${c.title}</h3>
           <p>${c.description}</p>
-          <div class="progress"><span style="width:${pct(c.raised || 0, c.goal)}%"></span></div>
-          <div class="campaign-meta">
-            <span class="raised">جُمع ${money(c.raised || 0)} ج.م</span>
-            <span class="goal">الهدف ${money(c.goal)}</span>
-          </div>
           <div class="campaign-foot">
-            <span class="pct">${pct(c.raised || 0, c.goal)}%</span>
+            <span class="chip chip-emerald"><i class="fas fa-seedling"></i> متاحة للدعم</span>
             <a href="/donate?campaign=${c.id}" class="btn btn-primary btn-sm"><i class="fas fa-heart"></i> تبرّع</a>
           </div>
         </div>

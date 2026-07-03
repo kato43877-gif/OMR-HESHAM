@@ -54,7 +54,7 @@ export const volunteersPage = (success = false, errorMsg: string | null = null) 
             <div class="field"><label>العمر</label><input name="age" type="number" placeholder="العمر"></div>
           </div>
           <div class="grid cols-2" style="gap:0 1rem">
-            <div class="field"><label>الجوال <span class="req">*</span></label><input name="phone" required placeholder="01xxxxxxxxx"></div>
+            <div class="field"><label>الجوال <span class="req">*</span></label><input name="phone" required placeholder="رقم التواصل"></div>
             <div class="field"><label>المدينة</label><input name="city" placeholder="المحافظة / المدينة"></div>
           </div>
           <div class="field"><label>مجال التطوّع المفضّل</label>

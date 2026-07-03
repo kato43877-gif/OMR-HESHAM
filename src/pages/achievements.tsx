@@ -5,56 +5,26 @@ export const achievementsPage = () => pageHero(
   'بفضل الله ثم بفضل شركائنا وداعمينا، نصنع أثراً حقيقياً في حياة الناس.',
   'الإنجازات'
 ) + `
-<!-- Real Stats -->
-<section class="section-tight">
-  <div class="wrap">
-    <div class="stats-strip reveal">
-      <div class="grid cols-4">
-        <div class="stat-item">
-          <i class="fas fa-family"></i>
-          <div class="num"><span data-count="50">0</span>+</div>
-          <div class="lbl">أسرة مستفيدة</div>
-        </div>
-        <div class="stat-item">
-          <i class="fas fa-sack-dollar"></i>
-          <div class="num"><span data-count="60000">0</span></div>
-          <div class="lbl">ج.م دعم الأسر</div>
-        </div>
-        <div class="stat-item">
-          <i class="fas fa-hospital"></i>
-          <div class="num"><span data-count="20000">0</span></div>
-          <div class="lbl">ج.م دعم المرضى</div>
-        </div>
-        <div class="stat-item">
-          <i class="fas fa-hand-holding-heart"></i>
-          <div class="num"><span data-count="80000">0</span>+</div>
-          <div class="lbl">ج.م إجمالي الدعم</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
 <!-- Spending Report -->
 <section class="section">
   <div class="wrap">
     <div class="sec-head center">
-      <span class="eyebrow reveal" style="justify-content:center">تقرير الصرف</span>
+      <span class="eyebrow reveal" style="justify-content:center">تقرير صرف الدعم</span>
       <h2 class="h-xl reveal d1" style="margin-top:.8rem">الحمد لله <span class="text-grad-gold">تم صرف الدعم</span></h2>
-      <p class="lead reveal d2">نسأل الله أن يجعل هذا العمل في ميزان حسنات كل من شارك وساهم. بارك الله في الجميع.</p>
+      <p class="lead reveal d2">نسأل الله أن يجعل هذا العمل في ميزان حسنات كل من شارك وساهم، وأن يبارك في كل يد امتدت للخير.</p>
     </div>
-    <div class="grid cols-2" style="max-width:800px;margin:0 auto">
-      <div class="card reveal d1" style="text-align:center;padding:2.5rem;border-top:4px solid var(--brand-gold)">
-        <i class="fas fa-family" style="font-size:3rem;color:var(--brand-gold);margin-bottom:1rem"></i>
-        <h3 class="h-lg" style="color:var(--brand-gold)">٦٠,٠٠٠ ج.م</h3>
-        <p style="font-size:1.1rem;font-weight:700;margin-top:.5rem">دعم الأسر المحتاجة</p>
-        <p style="color:var(--muted);margin-top:.5rem">عدد ٥٠ أسرة بإجمالي مبلغ ٦٠,٠٠٠ جنيه</p>
+    <div class="grid cols-2" style="max-width:860px;margin:0 auto">
+      <div class="card reveal d1" style="text-align:center;padding:2.3rem;border-top:4px solid var(--brand-gold)">
+        <div class="card-icon ic-gold" style="margin-inline:auto"><i class="fas fa-family"></i></div>
+        <h3 class="h-lg" style="color:var(--gold-700)" dir="rtl">دعم بقيمة ٦٠,٠٠٠ جنيه</h3>
+        <p style="font-size:1.05rem;font-weight:800;margin-top:.5rem">دعم الأسر المحتاجة</p>
+        <p style="color:var(--muted);margin-top:.5rem">دعم مباشر لعدد ٥٠ أسرة من الأسر الأولى بالرعاية.</p>
       </div>
-      <div class="card reveal d2" style="text-align:center;padding:2.5rem;border-top:4px solid #2ecc71">
-        <i class="fas fa-heart-pulse" style="font-size:3rem;color:#2ecc71;margin-bottom:1rem"></i>
-        <h3 class="h-lg" style="color:#2ecc71">٢٠,٠٠٠ ج.م</h3>
-        <p style="font-size:1.1rem;font-weight:700;margin-top:.5rem">دعم المرضى</p>
-        <p style="color:var(--muted);margin-top:.5rem">دعم مالي وعلاجي لمرضى غير قادرين</p>
+      <div class="card reveal d2" style="text-align:center;padding:2.3rem;border-top:4px solid var(--emerald-600)">
+        <div class="card-icon ic-emerald" style="margin-inline:auto"><i class="fas fa-heart-pulse"></i></div>
+        <h3 class="h-lg" style="color:var(--emerald-700)" dir="rtl">دعم بقيمة ٢٠,٠٠٠ جنيه</h3>
+        <p style="font-size:1.05rem;font-weight:800;margin-top:.5rem">دعم المرضى</p>
+        <p style="color:var(--muted);margin-top:.5rem">مساهمة علاجية ومالية لمساندة المرضى غير القادرين.</p>
       </div>
     </div>
   </div>
@@ -84,7 +54,7 @@ export const achievementsPage = () => pageHero(
     <div class="center" style="margin-top:2rem">
       <div class="card reveal" style="max-width:600px;display:inline-block;text-align:center;padding:1.5rem;background:var(--grad-hero);color:#fff;border-radius:1rem">
         <p style="font-size:1.1rem;line-height:1.8;font-weight:600">﴿ وَمَنْ أَحْيَاهَا فَكَأَنَّمَا أَحْيَا النَّاسَ جَمِيعًا ﴾</p>
-        <p style="opacity:.6;font-size:.85rem;margin-top:.4rem">سورة المائدة — الآية ٣٢</p>
+        <p style="opacity:.6;font-size:.85rem;margin-top:.4rem">سورة المائدة</p>
       </div>
     </div>
   </div>

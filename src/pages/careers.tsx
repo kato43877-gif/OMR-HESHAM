@@ -70,7 +70,7 @@ export const careersPage = (jobs: any[] = [], success = false, errorMsg: string 
           <div class="field"><label>البريد <span class="req">*</span></label><input name="email" type="email" required placeholder="email@example.com"></div>
         </div>
         <div class="grid cols-2" style="gap:0 1rem">
-          <div class="field"><label>الجوال <span class="req">*</span></label><input name="phone" required placeholder="01xxxxxxxxx"></div>
+          <div class="field"><label>الجوال <span class="req">*</span></label><input name="phone" required placeholder="رقم التواصل"></div>
           <div class="field"><label>الوظيفة المتقدّم لها</label><select name="job_id">${jobs.map(j => `<option value="${j.id}">${j.title}</option>`).join('')}</select></div>
         </div>
         <div class="field"><label>نبذة عنك</label><textarea name="bio" placeholder="أخبرنا عن خبراتك ولماذا ترغب بالانضمام إلينا"></textarea></div>

@@ -63,7 +63,7 @@ export const about = (stats: any = { total_donors: 0, total_campaigns: 0, total_
     <div class="card reveal d1" style="max-width:900px;margin:2rem auto 0;padding:2rem;text-align:center;background:var(--grad-hero);color:#fff;border-radius:1.2rem">
       <i class="fas fa-book-quran" style="font-size:2rem;margin-bottom:1rem;color:var(--brand-gold)"></i>
       <p style="font-size:1.15rem;line-height:2;font-weight:600">﴿ مَثَلُ الَّذِينَ يُنْفِقُونَ أَمْوَالَهُمْ فِي سَبِيلِ اللَّهِ كَمَثَلِ حَبَّةٍ أَنْبَتَتْ سَبْعَ سَنَابِلَ فِي كُلِّ سُنْبُلَةٍ مِائَةُ حَبَّةٍ وَاللَّهُ يُضَاعِفُ لِمَنْ يَشَاءُ وَاللَّهُ وَاسِعٌ عَلِيمٌ ﴾</p>
-      <p style="opacity:.7;margin-top:.5rem;font-size:.9rem">سورة البقرة — الآية ٢٦١</p>
+      <p style="opacity:.7;margin-top:.5rem;font-size:.9rem">سورة البقرة</p>
     </div>
   </div>
 </section>
@@ -88,7 +88,7 @@ export const about = (stats: any = { total_donors: 0, total_campaigns: 0, total_
         <div class="card-icon ic-gold" style="margin-inline:auto"><i class="fas fa-book-quran"></i></div>
         <h3>سورة الفاتحة</h3>
         <p style="font-size:1.1rem; line-height:2; font-weight:700; color:var(--blue-900); margin-top:1rem" dir="rtl">
-          بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ ﴿١﴾ الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ ﴿٢﴾ الرَّحْمَنِ الرَّحِيمِ ﴿٣﴾ مَالِكِ يَوْمِ الدِّينِ ﴿٤﴾ إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ ﴿٥﴾ اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ ﴿٦﴾ صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ ﴿٧﴾
+          بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ، الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ، الرَّحْمَنِ الرَّحِيمِ، مَالِكِ يَوْمِ الدِّينِ، إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ، اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ، صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ
         </p>
       </article>
 

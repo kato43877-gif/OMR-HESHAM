@@ -66,20 +66,11 @@ export const nav = (active = '', user?: any) => {
     const cls = active === n.key ? 'active' : ''
     return `<li class="${cls}"><a href="${n.href}">${n.label}</a></li>`
   }
+  const authLink = user
+    ? `<a href="/profile" class="nav-account" title="حسابي"><i class="fas fa-user-circle"></i><span>حسابي</span></a>`
+    : `<a href="/login" class="nav-account" title="تسجيل الدخول"><i class="fas fa-user-shield"></i><span>تسجيل الدخول</span></a>`
+
   return `
-  <div class="topbar">
-    <div class="wrap">
-      <div class="tb-left"><i class="fas fa-location-dot"></i> كفر العنانية &nbsp;·&nbsp; <i class="fas fa-clock"></i> السبت – الخميس ٩ص – ٥م</div>
-      <div class="tb-right">
-        <a href="tel:01060920249"><i class="fas fa-phone"></i> 01060920249</a>
-        ${user ? 
-          `<a href="/profile" style="font-weight:700;color:var(--brand-gold)"><i class="fas fa-user-circle"></i> حسابي</a>`
-        : 
-          `<a href="/login"><i class="fas fa-user-shield"></i> تسجيل الدخول</a>`
-        }
-      </div>
-    </div>
-  </div>
   <header class="nav" id="mainNav">
     <div class="wrap-wide">
       <a href="/" class="brand" aria-label="الصفحة الرئيسية">
@@ -95,6 +86,7 @@ export const nav = (active = '', user?: any) => {
         return link(n)
       }).join('')}</ul>
       <div class="nav-cta">
+        ${authLink}
         <button class="theme-btn" id="themeToggle" title="تبديل المظهر" aria-label="تبديل المظهر"><i class="fas fa-moon"></i></button>
         <button class="lang-btn" id="langToggle" title="English">EN</button>
         <a href="/donate" class="btn btn-gold magnetic"><i class="fas fa-hand-holding-heart"></i> تبرّع الآن</a>
@@ -125,6 +117,7 @@ export const nav = (active = '', user?: any) => {
       <a href="/faq">الأسئلة الشائعة</a>
       <a href="/contact">تواصل معنا</a>
       ${user?.role === 'admin' ? '<a href="/dashboard">لوحة التحكم</a>' : ''}
+      ${authLink}
       <a href="/donate" class="btn btn-gold btn-block" style="margin-top:1.2rem"><i class="fas fa-hand-holding-heart"></i> تبرّع الآن</a>
     </div>
   </div>`
@@ -133,7 +126,6 @@ export const nav = (active = '', user?: any) => {
 export const footer = (active = '') => {
   const fabAndToTop = `
 <a href="#" class="totop" id="toTop" aria-label="إلى الأعلى"><i class="fas fa-arrow-up"></i></a>
-<div class="fab"><a href="/donate" class="btn btn-gold magnetic"><i class="fas fa-heart"></i> تبرّع</a></div>
 `
   if (active !== 'home') return fabAndToTop
 
@@ -180,7 +172,7 @@ export const footer = (active = '') => {
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© ${new Date().getFullYear()} مؤسسة الدكتور عمر هشام الخيرية · جميع الحقوق محفوظة</span>
+      <span>مؤسسة الدكتور عمر هشام الخيرية · جميع الحقوق محفوظة</span>
       <div style="display:flex;gap:1.4rem">
         <a href="/transparency">سياسة الخصوصية</a>
         <a href="/transparency">الشروط والأحكام</a>
@@ -239,7 +231,7 @@ export const ctaBanner = () => `
     <div class="cta-banner reveal-scale">
       <span class="eyebrow" style="color:#ffe9b8;justify-content:center">معًا نصنع الأثر</span>
       <h2 class="h-xl" style="margin-top:1rem">عطاؤك اليوم يُغيّر حياة غدًا</h2>
-      <p class="lead" style="margin:1rem auto 0;max-width:620px">انضمّ إلى آلاف المحسنين الذين يصنعون أملاً حقيقيًا. كل تبرّع — مهما كان — يصل إلى مستحقيه بأمانة وشفافية كاملة.</p>
+      <p class="lead" style="margin:1rem auto 0;max-width:620px">انضمّ إلى أهل الخير الذين يصنعون أملاً حقيقيًا. كل تبرّع يصل إلى مستحقيه بأمانة وشفافية كاملة.</p>
       <div class="hero-actions">
         <a href="/donate" class="btn btn-gold btn-lg magnetic"><i class="fas fa-hand-holding-heart"></i> تبرّع الآن</a>
         <a href="/volunteers" class="btn btn-outline-light btn-lg"><i class="fas fa-hands-helping"></i> كن متطوعًا</a>

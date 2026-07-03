@@ -17,7 +17,7 @@ export const eventsPage = (events: any[] = []) => pageHero(
             <h3 class="h-lg">${events[0].title}</h3>
             <p>${events[0].description}</p>
             <div style="display:flex;gap:1.4rem;flex-wrap:wrap;margin:.6rem 0">
-              <span class="chip chip-blue"><i class="fas fa-calendar"></i> ${new Date(events[0].event_date).toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+              <span class="chip chip-blue"><i class="fas fa-calendar"></i> موعد يعلن لاحقًا</span>
               <span class="chip"><i class="fas fa-location-dot"></i> ${events[0].location}</span>
             </div>
             <a href="#" class="btn btn-primary magnetic"><i class="fas fa-ticket"></i> احجز مقعدك</a>
@@ -30,21 +30,16 @@ export const eventsPage = (events: any[] = []) => pageHero(
       <div class="reveal d1">
         <h2 class="h-lg" style="margin-bottom:1.4rem">الفعاليات القادمة</h2>
         <div class="flow">
-          ${events.length ? events.map((e: any) => {
-            const date = new Date(e.event_date);
-            const d = date.getDate();
-            const m = date.toLocaleDateString('ar-EG', { month: 'short' });
-            return `
+          ${events.length ? events.map((e: any) => `
             <div class="event-row">
-              <div class="event-date"><div class="d">${d}</div><div class="m">${m}</div></div>
+              <div class="card-icon ic-blue" style="margin:0;flex-shrink:0"><i class="fas fa-calendar-check"></i></div>
               <div style="flex:1">
                 <span class="chip chip-blue" style="margin-bottom:.4rem">فعالية</span>
                 <h3 style="font-size:1.08rem">${e.title}</h3>
                 <p style="color:var(--muted);font-size:.88rem"><i class="fas fa-location-dot"></i> ${e.location}</p>
               </div>
               <a href="#" class="btn btn-ghost btn-sm">التفاصيل</a>
-            </div>`
-          }).join('') : '<p style="text-align:center;color:var(--muted);padding:2rem">لا توجد فعاليات قادمة حالياً.</p>'}
+            </div>`).join('') : '<p style="text-align:center;color:var(--muted);padding:2rem">لا توجد فعاليات قادمة حالياً.</p>'}
         </div>
       </div>
     </div>

@@ -1,9 +1,6 @@
 import { ctaBanner } from '../layout'
 import { programs, img } from '../data'
 
-const pct = (r: number, g: number) => Math.min(100, Math.round((r / g) * 100))
-const money = (n: number) => n.toLocaleString('ar-EG')
-
 export const home = ({ campaigns = [], news = [], stories = [], stats = { total_donors: 0, total_campaigns: 0, total_volunteers: 0 }, partners = [] }: any = {}) => `
 <!-- ============ HERO ============ -->
 <section class="hero">
@@ -19,11 +16,6 @@ export const home = ({ campaigns = [], news = [], stories = [], stats = { total_
       <div class="hero-actions reveal d3">
         <a href="/donate" class="btn btn-gold btn-lg magnetic"><i class="fas fa-hand-holding-heart"></i> ابدأ عطاءك</a>
         <a href="/about" class="btn btn-outline-light btn-lg"><i class="fas fa-circle-play"></i> تعرّف علينا</a>
-      </div>
-      <div class="hero-stats reveal d4">
-        <div class="hero-stat"><b>${stats.total_donors || '—'}</b><span>مستفيد</span></div>
-        <div class="hero-stat"><b>${stats.total_campaigns || '—'}</b><span>حملة إنسانية</span></div>
-        <div class="hero-stat"><b>${stats.total_volunteers || '—'}</b><span>متطوّع</span></div>
       </div>
     </div>
 
@@ -42,48 +34,6 @@ export const home = ({ campaigns = [], news = [], stories = [], stats = { total_
   </div>
   <div class="wave-divider">
     <svg viewBox="0 0 1440 90" preserveAspectRatio="none"><path fill="#fbfaf6" d="M0,40 C360,90 720,0 1080,40 C1260,60 1380,50 1440,40 L1440,90 L0,90 Z"></path></svg>
-  </div>
-</section>
-
-<!-- ============ PARTNERS MARQUEE ============ -->
-<section class="section-tight">
-  <div class="wrap center">
-    <p class="eyebrow" style="justify-content:center;margin-bottom:1.6rem">شركاء النجاح والثقة</p>
-    <div class="marquee">
-      <div class="marquee-track">
-        ${partners.length ? [...partners, ...partners].map((p: any) => `<span class="partner"><i class="fas fa-handshake"></i> ${p.name || p}</span>`).join('') : '<span class="partner">شركاؤنا الداعمون</span>'}
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============ STATS STRIP ============ -->
-<section class="section-tight">
-  <div class="wrap">
-    <div class="stats-strip reveal">
-      <div class="grid cols-4">
-        <div class="stat-item">
-          <i class="fas fa-hand-holding-heart"></i>
-          <div class="num"><span data-count="${stats.total_donors || 0}">0</span>+</div>
-          <div class="lbl">مستفيد ومستفيدة</div>
-        </div>
-        <div class="stat-item">
-          <i class="fas fa-bullhorn"></i>
-          <div class="num"><span data-count="${stats.total_campaigns || 0}">0</span>+</div>
-          <div class="lbl">حملة إنسانية</div>
-        </div>
-        <div class="stat-item">
-          <i class="fas fa-hands-helping"></i>
-          <div class="num"><span data-count="${stats.total_volunteers || 0}">0</span>+</div>
-          <div class="lbl">متطوّع نشط</div>
-        </div>
-        <div class="stat-item">
-          <i class="fas fa-globe"></i>
-          <div class="num"><span data-count="1">0</span></div>
-          <div class="lbl">كفر العنانية</div>
-        </div>
-      </div>
-    </div>
   </div>
 </section>
 
@@ -152,13 +102,8 @@ export const home = ({ campaigns = [], news = [], stories = [], stats = { total_
         <div class="campaign-body">
           <h3>${c.title}</h3>
           <p>${c.description}</p>
-          <div class="progress"><span style="width:${pct(c.raised || 0, c.goal)}%"></span></div>
-          <div class="campaign-meta">
-            <span class="raised">جُمع ${money(c.raised || 0)} ج.م</span>
-            <span class="goal">الهدف ${money(c.goal)}</span>
-          </div>
           <div class="campaign-foot">
-            <span class="pct">${pct(c.raised || 0, c.goal)}%</span>
+            <span class="chip chip-emerald"><i class="fas fa-seedling"></i> متاحة للدعم</span>
             <a href="/donate?campaign=${c.id}" class="btn btn-primary btn-sm"><i class="fas fa-heart"></i> تبرّع</a>
           </div>
         </div>
@@ -175,7 +120,7 @@ export const home = ({ campaigns = [], news = [], stories = [], stats = { total_
   <div class="wrap">
     <div class="sec-head center">
       <span class="eyebrow reveal" style="justify-content:center">كيف نعمل</span>
-      <h2 class="h-xl reveal d1" style="margin-top:.8rem">من تبرّعك إلى <span class="text-grad-brand">الأثر</span> في ٤ خطوات</h2>
+      <h2 class="h-xl reveal d1" style="margin-top:.8rem">من تبرّعك إلى <span class="text-grad-brand">الأثر</span> بوضوح وشفافية</h2>
     </div>
     <div class="grid cols-4">
       ${[
@@ -187,7 +132,6 @@ export const home = ({ campaigns = [], news = [], stories = [], stats = { total_
       <div class="card reveal d${i + 1}" style="text-align:center">
         <div class="card-icon ic-blue" style="margin-inline:auto;position:relative">
           <i class="fas ${s.ic}"></i>
-          <span style="position:absolute;top:-10px;inset-inline-end:-10px;width:28px;height:28px;border-radius:50%;background:var(--grad-gold);color:#0c1a2b;display:grid;place-items:center;font-size:.85rem;font-weight:900">${['١','٢','٣','٤'][i]}</span>
         </div>
         <h3>${s.t}</h3><p>${s.d}</p>
       </div>`).join('')}
@@ -230,7 +174,6 @@ export const home = ({ campaigns = [], news = [], stories = [], stats = { total_
       <article class="news-card reveal d${i + 1}">
         <div class="news-media"><img src="${n.image_url || '/static/img/placeholder.jpg'}" alt="${n.title}" loading="lazy"><span class="chip chip-gold" style="position:absolute;top:1rem;inset-inline-start:1rem">${n.category}</span></div>
         <div class="news-body">
-          <div class="news-date"><span><i class="fas fa-calendar"></i> ${n.publish_date}</span></div>
           <h3>${n.title}</h3>
           <p style="color:var(--muted);font-size:.92rem">${n.excerpt}</p>
           <a href="/news/${n.id}" class="card-link">اقرأ المزيد <i class="fas fa-arrow-left"></i></a>
