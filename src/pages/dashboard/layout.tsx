@@ -72,17 +72,28 @@ export const dashboardLayout = (active: string, title: string, content: string) 
     .ds-link {
       display: flex; align-items: center; gap: .75rem; padding: .7rem .85rem; border-radius: 10px;
       font-weight: 600; font-size: .88rem; color: rgba(255,255,255,.6); transition: all .2s; text-decoration: none;
+      position: relative;
     }
     .ds-link i { width: 18px; text-align: center; font-size: .9rem; }
     .ds-link:hover { background: rgba(255,255,255,.06); color: rgba(255,255,255,.9); }
     .ds-link.active { background: linear-gradient(135deg, rgba(30,136,229,.2), rgba(67,160,71,.15)); color: #fff; border: 1px solid rgba(30,136,229,.2); }
     .ds-link.active i { color: var(--blue-400); }
+    .ds-link.active::after {
+      content: ''; position: absolute; top: 8px; bottom: 8px; inset-inline-start: 0; width: 4px; background: var(--gold-400); border-radius: 4px;
+    }
     .ds-footer { margin-top: auto; padding: .7rem; border-top: 1px solid rgba(255,255,255,.06); }
     .ds-logout { color: rgba(255,100,100,.7) !important; }
     .ds-logout:hover { color: #ff6b6b !important; background: rgba(255,100,100,.1) !important; }
 
     /* Main */
-    .dash-main { padding: 1.5rem clamp(1.2rem, 2.5vw, 2rem); min-width: 0; overflow-x: hidden; }
+    .dash-main {
+      padding: 1.5rem clamp(1.2rem, 2.5vw, 2rem); min-width: 0; overflow-x: hidden;
+      animation: dashContentFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    @keyframes dashContentFadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
     .dash-topbar {
       display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.8rem;
       padding: 1rem 1.5rem; background: var(--surface); border: 1px solid rgba(12,26,43,.05);
@@ -197,6 +208,25 @@ export const dashboardLayout = (active: string, title: string, content: string) 
       // Mobile sidebar toggle
       const burger = document.getElementById('dashBurger');
       if (window.innerWidth <= 980 && burger) burger.style.display = 'grid';
+
+      // Sidebar scroll preservation
+      const side = document.getElementById('dashSide');
+      if (side) {
+        const savedScroll = sessionStorage.getItem('dashSideScroll');
+        if (savedScroll) {
+          side.scrollTop = parseInt(savedScroll, 10);
+        }
+        side.addEventListener('click', function(e) {
+          const link = e.target.closest('.ds-link');
+          if (link) {
+            sessionStorage.setItem('dashSideScroll', side.scrollTop);
+          }
+        });
+        const activeLink = side.querySelector('.ds-link.active');
+        if (activeLink) {
+          activeLink.scrollIntoView({ block: 'nearest', behavior: 'instant' });
+        }
+      }
     })();
   </script>
 </body>
