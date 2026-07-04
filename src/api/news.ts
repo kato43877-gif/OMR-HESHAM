@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
-import { getSupabaseFromContext } from '../lib/supabase'
+import { getSupabaseFromContext, getSupabaseAdminFromContext } from '../lib/supabase'
+import { adminMiddleware } from './middleware'
 
 export const news = new Hono()
 
@@ -31,51 +32,69 @@ news.get('/:id', async (c) => {
   return c.json({ data })
 })
 
-news.post('/add', async (c) => {
-  const supabase = getSupabaseFromContext(c)
+// Add news (Admin only)
+news.post('/add', adminMiddleware, async (c) => {
+  const supabase = getSupabaseAdminFromContext(c)
   const body = await c.req.parseBody()
   
+  const title = body.title as string
+  const content = body.content as string
+  const excerpt = body.excerpt as string
+
+  if (!title || !content || !excerpt) {
+    return c.redirect('/dashboard/news?error=missing_fields')
+  }
+
   const { error } = await supabase
     .from('news')
     .insert([{
-      title: body.title,
-      category: body.category || null,
-      excerpt: body.excerpt,
-      content: body.content,
-      image_url: body.image_url || null
+      title,
+      category: (body.category as string) || null,
+      excerpt,
+      content,
+      image_url: (body.image_url as string) || null
     }])
 
   if (error) {
-    // Note: use standard logging in real app
     console.error('Error creating news:', error.message)
-    return c.redirect('/dashboard/news?error=1')
+    return c.redirect('/dashboard/news?error=db_error')
   }
   
   return c.redirect('/dashboard/news?success=1')
 })
 
-news.post('/edit/:id', async (c) => {
-  const supabase = getSupabaseFromContext(c)
+// Edit news (Admin only)
+news.post('/edit/:id', adminMiddleware, async (c) => {
+  const supabase = getSupabaseAdminFromContext(c)
   const id = c.req.param('id')
   const body = await c.req.parseBody()
   
+  const title = body.title as string
+  const content = body.content as string
+  const excerpt = body.excerpt as string
+
+  if (!title || !content || !excerpt) {
+    return c.redirect('/dashboard/news?error=missing_fields')
+  }
+
   const { error } = await supabase
     .from('news')
     .update({
-      title: body.title,
-      category: body.category || null,
-      excerpt: body.excerpt,
-      content: body.content,
-      image_url: body.image_url || null
+      title,
+      category: (body.category as string) || null,
+      excerpt,
+      content,
+      image_url: (body.image_url as string) || null
     })
     .eq('id', id)
 
-  if (error) return c.redirect('/dashboard/news?error=1')
+  if (error) return c.redirect('/dashboard/news?error=db_error')
   return c.redirect('/dashboard/news?success=1')
 })
 
-news.post('/delete/:id', async (c) => {
-  const supabase = getSupabaseFromContext(c)
+// Delete news (Admin only)
+news.post('/delete/:id', adminMiddleware, async (c) => {
+  const supabase = getSupabaseAdminFromContext(c)
   const id = c.req.param('id')
   
   const { error } = await supabase
@@ -83,6 +102,6 @@ news.post('/delete/:id', async (c) => {
     .delete()
     .eq('id', id)
 
-  if (error) return c.redirect('/dashboard/news?error=1')
+  if (error) return c.redirect('/dashboard/news?error=db_error')
   return c.redirect('/dashboard/news?success=1')
 })

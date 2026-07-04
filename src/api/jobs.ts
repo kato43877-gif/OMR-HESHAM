@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
-import { getSupabaseFromContext } from '../lib/supabase'
+import { getSupabaseFromContext, getSupabaseAdminFromContext } from '../lib/supabase'
+import { adminMiddleware } from './middleware'
 
 export const jobs = new Hono()
 
@@ -16,9 +17,9 @@ jobs.get('/', async (c) => {
   return c.json({ data })
 })
 
-// Add job (from dashboard)
-jobs.post('/add', async (c) => {
-  const supabase = getSupabaseFromContext(c)
+// Add job (Admin only)
+jobs.post('/add', adminMiddleware, async (c) => {
+  const supabase = getSupabaseAdminFromContext(c)
   const body = await c.req.parseBody()
 
   const { error } = await supabase
@@ -40,8 +41,9 @@ jobs.post('/add', async (c) => {
   return c.redirect('/dashboard/jobs?success=1')
 })
 
-jobs.post('/edit/:id', async (c) => {
-  const supabase = getSupabaseFromContext(c)
+// Edit job (Admin only)
+jobs.post('/edit/:id', adminMiddleware, async (c) => {
+  const supabase = getSupabaseAdminFromContext(c)
   const id = c.req.param('id')
   const body = await c.req.parseBody()
   
@@ -61,8 +63,9 @@ jobs.post('/edit/:id', async (c) => {
   return c.redirect('/dashboard/jobs?success=1')
 })
 
-jobs.post('/delete/:id', async (c) => {
-  const supabase = getSupabaseFromContext(c)
+// Delete job (Admin only)
+jobs.post('/delete/:id', adminMiddleware, async (c) => {
+  const supabase = getSupabaseAdminFromContext(c)
   const id = c.req.param('id')
   
   const { error } = await supabase
@@ -76,7 +79,7 @@ jobs.post('/delete/:id', async (c) => {
 
 // Apply for a job (accepts form data from browser)
 jobs.post('/apply', async (c) => {
-  const supabase = getSupabaseFromContext(c)
+  const supabase = getSupabaseAdminFromContext(c)
 
   // Accept both JSON and form data
   const contentType = c.req.header('content-type') || ''
@@ -93,7 +96,7 @@ jobs.post('/apply', async (c) => {
     if (!contentType.includes('application/json')) {
       return c.redirect('/careers?error=missing_fields')
     }
-    return c.json({ error: 'Missing required fields' }, 400)
+    return c.json({ error: 'الرجاء ملء جميع الحقول الإلزامية' }, 400)
   }
 
   const { error } = await supabase
@@ -115,5 +118,5 @@ jobs.post('/apply', async (c) => {
   }
 
   if (error) return c.json({ error: error.message }, 400)
-  return c.json({ message: 'Application submitted successfully.' })
+  return c.json({ message: 'تم تقديم طلبك بنجاح.' })
 })

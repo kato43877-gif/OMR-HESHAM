@@ -1,11 +1,12 @@
 import { Hono } from 'hono'
-import { getSupabaseFromContext } from '../lib/supabase'
+import { getSupabaseAdminFromContext } from '../lib/supabase'
+import { adminMiddleware } from './middleware'
 
 export const contacts = new Hono()
 
 // Submit a contact message (accepts form data from browser)
 contacts.post('/', async (c) => {
-  const supabase = getSupabaseFromContext(c)
+  const supabase = getSupabaseAdminFromContext(c)
 
   // Accept both JSON and form data
   const contentType = c.req.header('content-type') || ''
@@ -22,7 +23,7 @@ contacts.post('/', async (c) => {
     if (!contentType.includes('application/json')) {
       return c.redirect('/contact?error=missing_fields')
     }
-    return c.json({ error: 'Missing required fields' }, 400)
+    return c.json({ error: 'الرجاء ملء جميع الحقول المطلوبة' }, 400)
   }
 
   const { error } = await supabase
@@ -30,8 +31,8 @@ contacts.post('/', async (c) => {
     .insert([{
       name,
       email,
-      phone,
-      subject,
+      phone: phone || null,
+      subject: subject || null,
       message,
       status: 'unread'
     }])
@@ -43,12 +44,12 @@ contacts.post('/', async (c) => {
   }
 
   if (error) return c.json({ error: error.message }, 400)
-  return c.json({ message: 'Message sent successfully.' })
+  return c.json({ message: 'تم إرسال رسالتك بنجاح.' })
 })
 
-// Update status (Admin)
-contacts.post('/status/:id', async (c) => {
-  const supabase = getSupabaseFromContext(c)
+// Update status (Admin only)
+contacts.post('/status/:id', adminMiddleware, async (c) => {
+  const supabase = getSupabaseAdminFromContext(c)
   const id = c.req.param('id')
   const body = await c.req.parseBody()
   

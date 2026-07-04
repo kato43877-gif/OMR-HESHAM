@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { getCookie } from 'hono/cookie'
 import { api } from './api'
-import { getSupabaseFromContext } from './lib/supabase'
+import { getSupabaseFromContext, getSupabaseAdminFromContext } from './lib/supabase'
 import { page } from './layout'
 import { home } from './pages/home'
 import { about } from './pages/about'
@@ -184,7 +184,7 @@ app.use('/dashboard/*', dashboardGuard)
 
 // Dashboard Routes
 app.get('/dashboard', async (c) => {
-  const supabase = getSupabaseFromContext(c)
+  const supabase = getSupabaseAdminFromContext(c)
   
   const [{ count: cDonors }, { count: cCampaigns }, { count: cVolunteers }, { data: recentDonations }, { data: sumData }] = await Promise.all([
     supabase.from('donations').select('*', { count: 'exact', head: true }),
@@ -207,49 +207,49 @@ app.get('/dashboard', async (c) => {
 })
 
 app.get('/dashboard/campaigns', async (c) => {
-  const supabase = getSupabaseFromContext(c)
+  const supabase = getSupabaseAdminFromContext(c)
   const { data } = await supabase.from('campaigns').select('*').order('created_at', { ascending: false })
   return c.html(dashCampaigns(data || []))
 })
 
 app.get('/dashboard/donations', async (c) => {
-  const supabase = getSupabaseFromContext(c)
+  const supabase = getSupabaseAdminFromContext(c)
   const { data } = await supabase.from('donations').select('*').order('created_at', { ascending: false })
   return c.html(dashDonations(data || []))
 })
 
 app.get('/dashboard/volunteers', async (c) => {
-  const supabase = getSupabaseFromContext(c)
+  const supabase = getSupabaseAdminFromContext(c)
   const { data } = await supabase.from('volunteers').select('*').order('created_at', { ascending: false })
   return c.html(dashVolunteers(data || []))
 })
 
 app.get('/dashboard/contacts', async (c) => {
-  const supabase = getSupabaseFromContext(c)
+  const supabase = getSupabaseAdminFromContext(c)
   const { data } = await supabase.from('contacts').select('*').order('created_at', { ascending: false })
   return c.html(dashContacts(data || []))
 })
 
 app.get('/dashboard/news', async (c) => {
-  const supabase = getSupabaseFromContext(c)
+  const supabase = getSupabaseAdminFromContext(c)
   const { data } = await supabase.from('news').select('*').order('created_at', { ascending: false })
   return c.html(dashNews(data || []))
 })
 
 app.get('/dashboard/events', async (c) => {
-  const supabase = getSupabaseFromContext(c)
+  const supabase = getSupabaseAdminFromContext(c)
   const { data } = await supabase.from('events').select('*').order('created_at', { ascending: false })
   return c.html(dashEvents(data || []))
 })
 
 app.get('/dashboard/stories', async (c) => {
-  const supabase = getSupabaseFromContext(c)
+  const supabase = getSupabaseAdminFromContext(c)
   const { data } = await supabase.from('stories').select('*').order('created_at', { ascending: false })
   return c.html(dashStories(data || []))
 })
 
 app.get('/dashboard/jobs', async (c) => {
-  const supabase = getSupabaseFromContext(c)
+  const supabase = getSupabaseAdminFromContext(c)
   const [ { data: jobs }, { data: apps } ] = await Promise.all([
     supabase.from('jobs').select('*').order('created_at', { ascending: false }),
     supabase.from('job_applications').select('*').order('created_at', { ascending: false })
@@ -258,13 +258,13 @@ app.get('/dashboard/jobs', async (c) => {
 })
 
 app.get('/dashboard/newsletter', async (c) => {
-  const supabase = getSupabaseFromContext(c)
+  const supabase = getSupabaseAdminFromContext(c)
   const { data } = await supabase.from('newsletter_subscribers').select('*').order('created_at', { ascending: false })
   return c.html(dashNewsletter(data || []))
 })
 
 app.get('/dashboard/users', async (c) => {
-  const supabase = getSupabaseFromContext(c)
+  const supabase = getSupabaseAdminFromContext(c)
   const { data } = await supabase.from('profiles').select('*').order('created_at', { ascending: false })
   return c.html(dashUsers(data || []))
 })
@@ -306,5 +306,27 @@ app.notFound((c) => c.html(page({ user: (c as any).get('user'), title: 'الصف
     <a href="/" class="btn btn-gold btn-lg magnetic"><i class="fas fa-house"></i> العودة للرئيسية</a>
   </div>
 </section>`)))
+
+app.get('/sitemap.xml', (c) => {
+  c.header('Content-Type', 'application/xml')
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+   <url><loc>https://omarhesham.org/</loc><priority>1.0</priority></url>
+   <url><loc>https://omarhesham.org/about</loc><priority>0.8</priority></url>
+   <url><loc>https://omarhesham.org/campaigns</loc><priority>0.9</priority></url>
+   <url><loc>https://omarhesham.org/achievements</loc><priority>0.7</priority></url>
+   <url><loc>https://omarhesham.org/success-stories</loc><priority>0.8</priority></url>
+   <url><loc>https://omarhesham.org/events</loc><priority>0.8</priority></url>
+   <url><loc>https://omarhesham.org/gallery</loc><priority>0.6</priority></url>
+   <url><loc>https://omarhesham.org/donate</loc><priority>0.9</priority></url>
+   <url><loc>https://omarhesham.org/volunteers</loc><priority>0.8</priority></url>
+   <url><loc>https://omarhesham.org/careers</loc><priority>0.7</priority></url>
+   <url><loc>https://omarhesham.org/news</loc><priority>0.8</priority></url>
+   <url><loc>https://omarhesham.org/transparency</loc><priority>0.7</priority></url>
+   <url><loc>https://omarhesham.org/faq</loc><priority>0.5</priority></url>
+   <url><loc>https://omarhesham.org/contact</loc><priority>0.7</priority></url>
+</urlset>`
+  return c.body(xml)
+})
 
 export default app

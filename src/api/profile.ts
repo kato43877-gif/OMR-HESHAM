@@ -1,22 +1,13 @@
 import { Hono } from 'hono'
-import { getSupabaseFromContext } from '../lib/supabase'
-import { getCookie } from 'hono/cookie'
+import { getSupabaseAdminFromContext } from '../lib/supabase'
+import { authMiddleware } from './middleware'
 
 export const profile = new Hono()
 
-profile.post('/update', async (c) => {
-  const supabase = getSupabaseFromContext(c)
-  const token = getCookie(c, 'sb-access-token')
-  
-  if (!token) {
-    return c.redirect('/login?error=unauthorized')
-  }
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser(token)
-  
-  if (authError || !user) {
-    return c.redirect('/login?error=unauthorized')
-  }
+// Update profile information (Requires Auth)
+profile.post('/update', authMiddleware, async (c) => {
+  const supabase = getSupabaseAdminFromContext(c)
+  const user = (c as any).get('user')
 
   const body = await c.req.parseBody()
   const { full_name, phone } = body

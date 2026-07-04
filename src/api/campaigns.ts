@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
-import { getSupabaseFromContext } from '../lib/supabase'
+import { getSupabaseFromContext, getSupabaseAdminFromContext } from '../lib/supabase'
+import { adminMiddleware } from './middleware'
 
 export const campaigns = new Hono()
 
@@ -31,22 +32,25 @@ campaigns.get('/:id', async (c) => {
   return c.json({ data })
 })
 
-// Create campaign (Admin only - requires proper RLS or checking token in Supabase client)
-campaigns.post('/add', async (c) => {
-  const supabase = getSupabaseFromContext(c)
-  
-  // Note: in a real app, you'd check auth cookies here to authenticate the admin.
-  // For the sake of this dashboard UI working out of the box, we will bypass server-side RLS 
-  // if you set the SERVICE_ROLE_KEY or just rely on RLS logic matching the active user.
-
+// Create campaign (Admin only)
+campaigns.post('/add', adminMiddleware, async (c) => {
+  const supabase = getSupabaseAdminFromContext(c)
   const body = await c.req.parseBody()
   
+  const title = body.title as string
+  const category = body.category as string
+  const goal = Number(body.goal)
+  
+  if (!title || !goal || isNaN(goal) || goal <= 0) {
+    return c.redirect('/dashboard/campaigns?error=invalid_inputs')
+  }
+
   const { error } = await supabase
     .from('campaigns')
     .insert([{
-      title: body.title,
-      category: body.category,
-      goal: Number(body.goal),
+      title,
+      category,
+      goal,
       image_url: body.image_url || null,
       is_urgent: body.is_urgent === 'true',
       description: body.description || null
@@ -54,37 +58,48 @@ campaigns.post('/add', async (c) => {
 
   if (error) {
     console.error('Error creating campaign:', error.message)
-    return c.redirect('/dashboard/campaigns?error=1')
+    return c.redirect('/dashboard/campaigns?error=db_error')
   }
   
   return c.redirect('/dashboard/campaigns?success=1')
 })
 
-// Edit campaign
-campaigns.post('/edit/:id', async (c) => {
-  const supabase = getSupabaseFromContext(c)
+// Edit campaign (Admin only)
+campaigns.post('/edit/:id', adminMiddleware, async (c) => {
+  const supabase = getSupabaseAdminFromContext(c)
   const id = c.req.param('id')
   const body = await c.req.parseBody()
   
+  const title = body.title as string
+  const category = body.category as string
+  const goal = Number(body.goal)
+  
+  if (!title || !goal || isNaN(goal) || goal <= 0) {
+    return c.redirect('/dashboard/campaigns?error=invalid_inputs')
+  }
+
   const { error } = await supabase
     .from('campaigns')
     .update({
-      title: body.title,
-      category: body.category,
-      goal: Number(body.goal),
+      title,
+      category,
+      goal,
       image_url: body.image_url || null,
       is_urgent: body.is_urgent === 'true',
       description: body.description || null
     })
     .eq('id', id)
 
-  if (error) return c.redirect('/dashboard/campaigns?error=1')
+  if (error) {
+    console.error('Error updating campaign:', error.message)
+    return c.redirect('/dashboard/campaigns?error=db_error')
+  }
   return c.redirect('/dashboard/campaigns?success=1')
 })
 
-// Delete campaign
-campaigns.post('/delete/:id', async (c) => {
-  const supabase = getSupabaseFromContext(c)
+// Delete campaign (Admin only)
+campaigns.post('/delete/:id', adminMiddleware, async (c) => {
+  const supabase = getSupabaseAdminFromContext(c)
   const id = c.req.param('id')
   
   const { error } = await supabase
@@ -92,6 +107,9 @@ campaigns.post('/delete/:id', async (c) => {
     .delete()
     .eq('id', id)
 
-  if (error) return c.redirect('/dashboard/campaigns?error=1')
+  if (error) {
+    console.error('Error deleting campaign:', error.message)
+    return c.redirect('/dashboard/campaigns?error=db_error')
+  }
   return c.redirect('/dashboard/campaigns?success=1')
 })

@@ -1,11 +1,12 @@
 import { Hono } from 'hono'
-import { getSupabaseFromContext } from '../lib/supabase'
+import { getSupabaseAdminFromContext } from '../lib/supabase'
+import { adminMiddleware } from './middleware'
 
 export const newsletter = new Hono()
 
 // Subscribe to newsletter (accepts form data from browser)
 newsletter.post('/', async (c) => {
-  const supabase = getSupabaseFromContext(c)
+  const supabase = getSupabaseAdminFromContext(c)
 
   // Accept both JSON and form data
   const contentType = c.req.header('content-type') || ''
@@ -23,7 +24,7 @@ newsletter.post('/', async (c) => {
       const referer = c.req.header('referer') || '/'
       return c.redirect(referer)
     }
-    return c.json({ error: 'Email is required' }, 400)
+    return c.json({ error: 'البريد الإلكتروني مطلوب' }, 400)
   }
 
   const { error } = await supabase
@@ -42,12 +43,12 @@ newsletter.post('/', async (c) => {
   }
 
   if (error) return c.json({ error: error.message }, 400)
-  return c.json({ message: 'Subscribed successfully.' })
+  return c.json({ message: 'تم الاشتراك بنجاح في النشرة البريدية.' })
 })
 
-// Update subscriber status (Admin)
-newsletter.post('/status/:id', async (c) => {
-  const supabase = getSupabaseFromContext(c)
+// Update subscriber status (Admin only)
+newsletter.post('/status/:id', adminMiddleware, async (c) => {
+  const supabase = getSupabaseAdminFromContext(c)
   const id = c.req.param('id')
   const body = await c.req.parseBody()
   
@@ -60,9 +61,9 @@ newsletter.post('/status/:id', async (c) => {
   return c.redirect('/dashboard/newsletter?success=1')
 })
 
-// Delete subscriber (Admin)
-newsletter.post('/delete/:id', async (c) => {
-  const supabase = getSupabaseFromContext(c)
+// Delete subscriber (Admin only)
+newsletter.post('/delete/:id', adminMiddleware, async (c) => {
+  const supabase = getSupabaseAdminFromContext(c)
   const id = c.req.param('id')
   
   const { error } = await supabase

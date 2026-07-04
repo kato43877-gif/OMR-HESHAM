@@ -1,12 +1,13 @@
 import { Hono } from 'hono'
-import { getSupabaseFromContext } from '../lib/supabase'
+import { getSupabaseFromContext, getSupabaseAdminFromContext } from '../lib/supabase'
 import { getCookie } from 'hono/cookie'
+import { adminMiddleware, authMiddleware } from './middleware'
 
 export const volunteers = new Hono()
 
 // Submit a volunteer application (accepts form data from browser)
 volunteers.post('/', async (c) => {
-  const supabase = getSupabaseFromContext(c)
+  const supabase = getSupabaseAdminFromContext(c) // Use admin context to insert public applications securely
 
   // Get user from cookie if logged in
   let profile_id = null
@@ -30,18 +31,10 @@ volunteers.post('/', async (c) => {
   const { full_name, age, phone, city, preferred_role, skills } = body
 
   if (!full_name || !phone) {
-    // If form submission, redirect back with error
     if (!contentType.includes('application/json')) {
       return c.redirect('/volunteers?error=missing_fields')
     }
-    return c.json({ error: 'Missing required fields' }, 400)
-  }
-
-  // Set the session on the supabase client so that RLS knows who is making the request if authenticated
-  if (token) {
-    try {
-      await supabase.auth.setSession({ access_token: token, refresh_token: '' })
-    } catch(e) {}
+    return c.json({ error: 'الاسم ورقم الهاتف مطلوبان' }, 400)
   }
 
   const { error } = await supabase
@@ -64,31 +57,27 @@ volunteers.post('/', async (c) => {
   }
 
   if (error) return c.json({ error: error.message }, 400)
-  return c.json({ message: 'Application submitted successfully.' })
+  return c.json({ message: 'تم إرسال طلب التطوع بنجاح.' })
 })
 
 // Get my volunteer applications (Requires Auth)
-volunteers.get('/my', async (c) => {
-  const supabase = getSupabaseFromContext(c)
-
-  const authHeader = c.req.header('Authorization')
-  if (!authHeader) return c.json({ error: 'Unauthorized' }, 401)
-
-  const token = authHeader.replace('Bearer ', '')
-  await supabase.auth.setSession({ access_token: token, refresh_token: '' })
+volunteers.get('/my', authMiddleware, async (c) => {
+  const user = (c as any).get('user')
+  const supabase = getSupabaseAdminFromContext(c)
 
   const { data, error } = await supabase
     .from('volunteers')
     .select('*')
+    .eq('profile_id', user.id)
     .order('created_at', { ascending: false })
 
   if (error) return c.json({ error: error.message }, 400)
   return c.json({ data })
 })
 
-// Update status (Admin)
-volunteers.post('/status/:id', async (c) => {
-  const supabase = getSupabaseFromContext(c)
+// Update status (Admin only)
+volunteers.post('/status/:id', adminMiddleware, async (c) => {
+  const supabase = getSupabaseAdminFromContext(c)
   const id = c.req.param('id')
   const body = await c.req.parseBody()
   

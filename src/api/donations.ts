@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
-import { getSupabaseFromContext } from '../lib/supabase'
+import { getSupabaseFromContext, getSupabaseAdminFromContext } from '../lib/supabase'
+import { adminMiddleware, authMiddleware } from './middleware'
 
 export const donations = new Hono()
 
@@ -16,7 +17,6 @@ donations.post('/', async (c) => {
     const { data: { user } } = await supabase.auth.getUser(token)
     if (user) {
       profile_id = user.id
-      await supabase.auth.setSession({ access_token: token, refresh_token: '' })
     }
   }
 
@@ -24,7 +24,7 @@ donations.post('/', async (c) => {
   const { amount, donation_type, campaign_id, donor_name, donor_phone, donor_email, payment_method } = body
 
   if (!amount || !donor_name || !donor_phone || !payment_method) {
-    return c.json({ error: 'Missing required fields' }, 400)
+    return c.json({ error: 'الحقول المطلوبة غير مكتملة' }, 400)
   }
 
   const { data, error } = await supabase
@@ -32,34 +32,30 @@ donations.post('/', async (c) => {
     .insert([{
       profile_id,
       campaign_id: campaign_id || null,
-      amount,
+      amount: Number(amount),
       donation_type: donation_type || 'once',
       donor_name,
       donor_phone,
-      donor_email,
+      donor_email: donor_email || null,
       payment_method,
-      status: 'pending' // Initially pending until payment gateway confirms
+      status: 'completed' // Direct completed donation in this version (no payment gateway check needed as per user request)
     }])
     .select()
     .single()
 
   if (error) return c.json({ error: error.message }, 400)
-  return c.json({ data, message: 'Donation created successfully. Proceed to payment.' })
+  return c.json({ data, message: 'تم التبرع بنجاح. شكرًا لك!' })
 })
 
 // Get my donations (Requires Auth)
-donations.get('/my', async (c) => {
-  const supabase = getSupabaseFromContext(c)
+donations.get('/my', authMiddleware, async (c) => {
+  const user = (c as any).get('user')
+  const supabase = getSupabaseAdminFromContext(c) // Use admin to bypass restricted SELECT if user isn't fully synced yet, but filter by user.id
   
-  const authHeader = c.req.header('Authorization')
-  if (!authHeader) return c.json({ error: 'Unauthorized' }, 401)
-    
-  const token = authHeader.replace('Bearer ', '')
-  await supabase.auth.setSession({ access_token: token, refresh_token: '' })
-
   const { data, error } = await supabase
     .from('donations')
     .select('*, campaigns(title, category)')
+    .eq('profile_id', user.id)
     .order('created_at', { ascending: false })
 
   if (error) return c.json({ error: error.message }, 400)
@@ -68,7 +64,7 @@ donations.get('/my', async (c) => {
 
 // Accept donation from the public donate page (HTML form)
 donations.post('/add', async (c) => {
-  const supabase = getSupabaseFromContext(c)
+  const supabase = getSupabaseAdminFromContext(c)
   const body = await c.req.parseBody()
 
   const amount = Number(body.amount) || 0
@@ -99,9 +95,9 @@ donations.post('/add', async (c) => {
   return c.redirect('/donate?success=1')
 })
 
-// Update status (Admin)
-donations.post('/status/:id', async (c) => {
-  const supabase = getSupabaseFromContext(c)
+// Update status (Admin only)
+donations.post('/status/:id', adminMiddleware, async (c) => {
+  const supabase = getSupabaseAdminFromContext(c)
   const id = c.req.param('id')
   const body = await c.req.parseBody()
   
@@ -112,4 +108,25 @@ donations.post('/status/:id', async (c) => {
 
   if (error) return c.redirect('/dashboard/donations?error=1')
   return c.redirect('/dashboard/donations?success=1')
+})
+
+// Get donation stats (Admin only)
+donations.get('/stats', adminMiddleware, async (c) => {
+  const supabase = getSupabaseAdminFromContext(c)
+  
+  const [{ count: cDonors }, { count: cCampaigns }, { count: cVolunteers }, { data: sumData }] = await Promise.all([
+    supabase.from('donations').select('*', { count: 'exact', head: true }),
+    supabase.from('campaigns').select('*', { count: 'exact', head: true }),
+    supabase.from('volunteers').select('*', { count: 'exact', head: true }),
+    supabase.from('donations').select('amount')
+  ])
+
+  const totalAmount = (sumData || []).reduce((sum: number, d: any) => sum + Number(d.amount || 0), 0)
+
+  return c.json({
+    total_donations: totalAmount,
+    total_campaigns: cCampaigns || 0,
+    total_donors: cDonors || 0,
+    total_volunteers: cVolunteers || 0
+  })
 })

@@ -233,29 +233,140 @@
   }
   window.__toast = toast;
 
-  /* ---------- Forms (demo handling) ---------- */
+  /* ---------- Forms (AJAX handling & Validation) ---------- */
   $$('form').forEach(form => {
-    if (form.hasAttribute('action')) return; // Let real forms submit naturally
-    
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
+      // Don't intercept dashboard CRUD forms that act as normal POST forms unless they are custom-handled.
+      const action = form.getAttribute('action') || '';
+      if (action.includes('/dashboard/') || action.includes('/api/campaigns/') || action.includes('/api/news/') || action.includes('/api/events/') || action.includes('/api/stories/') || action.includes('/api/jobs/') || action.includes('/api/newsletter/status/') || action.includes('/api/newsletter/delete/') || action.includes('/api/volunteers/status/') || action.includes('/api/donations/status/') || action.includes('/api/users/')) {
+        return; // Let dashboard actions submit natively
+      }
+      
       e.preventDefault();
-      const redirect = form.dataset.redirect;
-      const msg = form.dataset.toast;
+
+      // Client-side validations
+      const emailInput = form.querySelector('input[type="email"]');
+      if (emailInput && emailInput.value) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(emailInput.value.trim())) {
+          toast('الرجاء إدخال بريد إلكتروني صالح ❌');
+          return;
+        }
+      }
+
+      const phoneInput = form.querySelector('input[type="tel"]');
+      if (phoneInput && phoneInput.value) {
+        const cleaned = phoneInput.value.replace(/[\s\-\(\)]/g, '');
+        const phoneRegex = /^(\+?2)?01[0125]\d{8}$/;
+        if (cleaned && !phoneRegex.test(cleaned)) {
+          toast('الرجاء إدخال رقم هاتف مصري صالح (مثال: 01012345678) ❌');
+          return;
+        }
+      }
+
+      const amountInput = form.querySelector('input[name="amount"]');
+      if (amountInput && amountInput.value) {
+        const amount = Number(amountInput.value);
+        if (isNaN(amount) || amount <= 0) {
+          toast('الرجاء إدخال مبلغ تبرع صالح أكبر من الصفر ❌');
+          return;
+        }
+      }
+
+      // Check required textareas/inputs manually for custom error message
+      let hasError = false;
+      const requiredInputs = $$( '[required]', form );
+      requiredInputs.forEach(input => {
+        if (!input.value.trim()) {
+          input.classList.add('input-error');
+          hasError = true;
+        } else {
+          input.classList.remove('input-error');
+        }
+      });
+
+      if (hasError) {
+        toast('يرجى ملء كافة الحقول المطلوبة ⚠️');
+        return;
+      }
+
       const btn = form.querySelector('button[type=submit]');
+      const orig = btn ? btn.innerHTML : '';
       if (btn) {
-        const orig = btn.innerHTML;
         btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> جارٍ المعالجة...';
         btn.disabled = true;
-        setTimeout(() => {
-          btn.disabled = false; btn.innerHTML = orig;
-          if (redirect) { window.location.href = redirect; return; }
-          toast(msg || 'تم الإرسال بنجاح ✅');
+      }
+
+      try {
+        // Collect form data
+        const formData = new FormData(form);
+        const data = {};
+        formData.forEach((value, key) => {
+          data[key] = value;
+        });
+
+        // Special handling for donations amount check
+        if (action.includes('/api/donations') && !data['amount']) {
+          const activeOpt = $('.amount-opt.active');
+          if (activeOpt) {
+            data['amount'] = activeOpt.dataset.amt;
+          } else if ($('#customAmt') && $('#customAmt').value) {
+            data['amount'] = $('#customAmt').value;
+          }
+        }
+
+        const isJson = !form.querySelector('input[type="file"]');
+        const headers = {};
+        let body;
+
+        if (isJson) {
+          headers['Content-Type'] = 'application/json';
+          body = JSON.stringify(data);
+        } else {
+          body = formData;
+        }
+
+        const response = await fetch(action || window.location.pathname, {
+          method: 'POST',
+          headers,
+          body
+        });
+
+        if (response.ok) {
+          const result = await response.json().catch(() => ({}));
+          toast(result.message || form.dataset.toast || 'تمت العملية بنجاح ✅');
           form.reset();
-        }, 1100);
-      } else if (redirect) { window.location.href = redirect; }
-      else { toast(msg || 'تم الإرسال بنجاح ✅'); form.reset(); }
+          
+          // reset any custom selects/amount selectors
+          $$('.amount-opt', form).forEach(o => o.classList.remove('active'));
+          if ($('#sumAmt')) $('#sumAmt').textContent = '٠';
+
+          const redirect = form.dataset.redirect;
+          if (redirect) {
+            setTimeout(() => {
+              window.location.href = redirect;
+            }, 1000);
+          } else if (action.includes('/api/auth/login') || action.includes('/api/profile/update')) {
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
+          }
+        } else {
+          const err = await response.json().catch(() => ({}));
+          toast(err.error || 'حدث خطأ ما، يرجى المحاولة مرة أخرى ❌');
+        }
+      } catch (err) {
+        console.error('Submission error:', err);
+        toast('خطأ في الاتصال بالخادم. يرجى المحاولة لاحقاً ❌');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = orig;
+        }
+      }
     });
   });
+
 
   /* ---------- Charts ---------- */
   function initCharts() {
