@@ -85,3 +85,18 @@ volunteers.get('/my', async (c) => {
   if (error) return c.json({ error: error.message }, 400)
   return c.json({ data })
 })
+
+// Update status (Admin)
+volunteers.post('/status/:id', async (c) => {
+  const supabase = getSupabaseFromContext(c)
+  const id = c.req.param('id')
+  const body = await c.req.parseBody()
+  
+  const { error } = await supabase
+    .from('volunteers')
+    .update({ status: body.status })
+    .eq('id', id)
+
+  if (error) return c.redirect('/dashboard/volunteers?error=1')
+  return c.redirect('/dashboard/volunteers?success=1')
+})

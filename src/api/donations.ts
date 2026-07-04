@@ -98,3 +98,18 @@ donations.post('/add', async (c) => {
 
   return c.redirect('/donate?success=1')
 })
+
+// Update status (Admin)
+donations.post('/status/:id', async (c) => {
+  const supabase = getSupabaseFromContext(c)
+  const id = c.req.param('id')
+  const body = await c.req.parseBody()
+  
+  const { error } = await supabase
+    .from('donations')
+    .update({ status: body.status })
+    .eq('id', id)
+
+  if (error) return c.redirect('/dashboard/donations?error=1')
+  return c.redirect('/dashboard/donations?success=1')
+})

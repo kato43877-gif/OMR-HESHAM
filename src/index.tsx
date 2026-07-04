@@ -26,6 +26,7 @@ import { dashNews } from './pages/dashboard/news'
 import { dashEvents } from './pages/dashboard/events'
 import { dashStories } from './pages/dashboard/stories'
 import { dashJobs } from './pages/dashboard/jobs'
+import { dashNewsletter } from './pages/dashboard/newsletter'
 import { dashUsers } from './pages/dashboard/users'
 import { loginPage } from './pages/auth'
 import { profilePage } from './pages/profile'
@@ -35,7 +36,6 @@ const app = new Hono()
 // Mount API routes
 app.route('/api', api)
 
-// Global middleware for UI user state
 app.use('*', async (c, next) => {
   const token = getCookie(c, 'sb-access-token')
   if (token) {
@@ -59,6 +59,18 @@ app.use('*', async (c, next) => {
   }
   await next()
 })
+
+import { Env } from './lib/supabase'
+
+app.get('/api/config', (c) => {
+  const env = c.env as Env;
+  return c.json({
+    supabaseUrl: env.SUPABASE_URL,
+    supabaseKey: env.SUPABASE_KEY,
+    user: (c as any).get('user') || null
+  })
+})
+
 
 app.get('/', async (c) => {
   const supabase = getSupabaseFromContext(c)
@@ -243,6 +255,12 @@ app.get('/dashboard/jobs', async (c) => {
     supabase.from('job_applications').select('*').order('created_at', { ascending: false })
   ])
   return c.html(dashJobs(jobs || [], apps || []))
+})
+
+app.get('/dashboard/newsletter', async (c) => {
+  const supabase = getSupabaseFromContext(c)
+  const { data } = await supabase.from('newsletter_subscribers').select('*').order('created_at', { ascending: false })
+  return c.html(dashNewsletter(data || []))
 })
 
 app.get('/dashboard/users', async (c) => {

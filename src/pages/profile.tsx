@@ -106,6 +106,28 @@ export const profilePage = (user: any, donations: any[], volunteerData: any) => 
           </div>
           `}
           
+          <!-- Profile Update Form -->
+          <div class="card">
+            <h3 class="h-sm" style="margin-bottom:1.5rem;display:flex;align-items:center;gap:.8rem">
+              <i class="fas fa-user-edit" style="color:var(--brand-gold)"></i> تحديث البيانات
+            </h3>
+            <form action="/api/profile/update" method="POST">
+              <div class="grid cols-2" style="gap:1rem">
+                <div class="field">
+                  <label>الاسم الكامل</label>
+                  <input type="text" name="full_name" value="${user.name || ''}" required>
+                </div>
+                <div class="field">
+                  <label>رقم الهاتف</label>
+                  <input type="tel" name="phone" value="${user.phone || ''}" dir="ltr">
+                </div>
+              </div>
+              <div style="margin-top:1rem">
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> حفظ التعديلات</button>
+              </div>
+            </form>
+          </div>
+          
         </div>
       </div>
     </div>

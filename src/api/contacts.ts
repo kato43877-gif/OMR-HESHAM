@@ -45,3 +45,18 @@ contacts.post('/', async (c) => {
   if (error) return c.json({ error: error.message }, 400)
   return c.json({ message: 'Message sent successfully.' })
 })
+
+// Update status (Admin)
+contacts.post('/status/:id', async (c) => {
+  const supabase = getSupabaseFromContext(c)
+  const id = c.req.param('id')
+  const body = await c.req.parseBody()
+  
+  const { error } = await supabase
+    .from('contacts')
+    .update({ status: body.status })
+    .eq('id', id)
+
+  if (error) return c.redirect('/dashboard/contacts?error=1')
+  return c.redirect('/dashboard/contacts?success=1')
+})

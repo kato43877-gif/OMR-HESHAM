@@ -44,3 +44,32 @@ newsletter.post('/', async (c) => {
   if (error) return c.json({ error: error.message }, 400)
   return c.json({ message: 'Subscribed successfully.' })
 })
+
+// Update subscriber status (Admin)
+newsletter.post('/status/:id', async (c) => {
+  const supabase = getSupabaseFromContext(c)
+  const id = c.req.param('id')
+  const body = await c.req.parseBody()
+  
+  const { error } = await supabase
+    .from('newsletter_subscribers')
+    .update({ status: body.status })
+    .eq('id', id)
+
+  if (error) return c.redirect('/dashboard/newsletter?error=1')
+  return c.redirect('/dashboard/newsletter?success=1')
+})
+
+// Delete subscriber (Admin)
+newsletter.post('/delete/:id', async (c) => {
+  const supabase = getSupabaseFromContext(c)
+  const id = c.req.param('id')
+  
+  const { error } = await supabase
+    .from('newsletter_subscribers')
+    .delete()
+    .eq('id', id)
+
+  if (error) return c.redirect('/dashboard/newsletter?error=1')
+  return c.redirect('/dashboard/newsletter?success=1')
+})

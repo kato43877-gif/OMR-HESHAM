@@ -14,7 +14,7 @@ export const dashJobs = (jobs: any[], applications: any[]) => dashboardLayout(
       <h3 style="margin-bottom:1rem">الوظائف الحالية</h3>
       <div style="overflow-x:auto">
         <table class="dtable">
-          <thead><tr><th>المسمى</th><th>القسم</th><th>النوع</th><th>الحالة</th></tr></thead>
+          <thead><tr><th>المسمى</th><th>القسم</th><th>النوع</th><th>الحالة</th><th>إجراء</th></tr></thead>
           <tbody>
             ${jobs.length ? jobs.map(j => `
             <tr>
@@ -22,7 +22,15 @@ export const dashJobs = (jobs: any[], applications: any[]) => dashboardLayout(
               <td>${j.department || '-'}</td>
               <td>${j.job_type || '-'}</td>
               <td>${j.is_active ? '<span class="badge badge-ok">نشط</span>' : '<span class="badge badge-info">مغلق</span>'}</td>
-            </tr>`).join('') : '<tr><td colspan="4" style="text-align:center;padding:1rem">لا توجد وظائف.</td></tr>'}
+              <td>
+                <div style="display:flex;gap:.5rem">
+                  <button class="btn btn-sm btn-ghost" onclick="editJob('${j.id}', \`${j.title.replace(/`/g, "\\`")}\`, '${j.department || ''}', '${j.job_type || ''}', '${j.location || ''}', \`${(j.description || '').replace(/`/g, "\\`")}\`, ${j.is_active})" title="تعديل"><i class="fas fa-edit"></i></button>
+                  <form action="/api/jobs/delete/${j.id}" method="POST" style="display:inline" onsubmit="return confirm('هل أنت متأكد من حذف هذه الوظيفة؟')">
+                    <button type="submit" class="btn btn-sm btn-ghost" style="color:var(--danger)" title="حذف"><i class="fas fa-trash"></i></button>
+                  </form>
+                </div>
+              </td>
+            </tr>`).join('') : '<tr><td colspan="5" style="text-align:center;padding:1rem">لا توجد وظائف.</td></tr>'}
           </tbody>
         </table>
       </div>
@@ -72,5 +80,26 @@ export const dashJobs = (jobs: any[], applications: any[]) => dashboardLayout(
       <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> حفظ الوظيفة</button>
     </form>
   </div>
+  
+  <script>
+    function editJob(id, title, department, job_type, location, description, is_active) {
+      document.getElementById('addJob').scrollIntoView({ behavior: 'smooth' });
+      const form = document.querySelector('#addJob form');
+      form.action = '/api/jobs/edit/' + id;
+      form.querySelector('h3') ? form.querySelector('h3').innerHTML = '<i class="fas fa-edit"></i> تعديل الوظيفة' : null;
+      form.elements['title'].value = title;
+      form.elements['department'].value = department;
+      form.elements['job_type'].value = job_type;
+      form.elements['location'].value = location;
+      form.elements['description'].value = description;
+      form.elements['is_active'].checked = is_active;
+      
+      const btn = form.querySelector('button[type="submit"]');
+      btn.innerHTML = '<i class="fas fa-save"></i> تحديث الوظيفة';
+      
+      const titleEl = document.querySelector('#addJob h3');
+      if (titleEl) titleEl.innerHTML = '<i class="fas fa-edit"></i> تعديل الوظيفة';
+    }
+  </script>
   `
 )

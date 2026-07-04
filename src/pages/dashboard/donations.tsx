@@ -11,7 +11,7 @@ export const dashDonations = (donations: any[]) => dashboardLayout(
   <div class="panel">
     <div style="overflow-x:auto">
       <table class="dtable">
-        <thead><tr><th>رقم المرجع</th><th>المتبرّع</th><th>البريد الإلكتروني</th><th>الهاتف</th><th>المبلغ</th><th>الطريقة</th><th>الحالة</th><th>التاريخ</th></tr></thead>
+        <thead><tr><th>رقم المرجع</th><th>المتبرّع</th><th>البريد الإلكتروني</th><th>الهاتف</th><th>المبلغ</th><th>الطريقة</th><th>الحالة</th><th>التاريخ</th><th>إجراء</th></tr></thead>
         <tbody>
           ${donations.length ? donations.map(d => `
           <tr>
@@ -23,7 +23,16 @@ export const dashDonations = (donations: any[]) => dashboardLayout(
             <td>${d.payment_method === 'card' ? 'بطاقة' : d.payment_method === 'transfer' ? 'تحويل' : d.payment_method || '-'}</td>
             <td><span class="badge badge-${d.status === 'completed' ? 'ok' : d.status === 'pending' ? 'pend' : 'info'}">${d.status}</span></td>
             <td style="color:var(--muted)">${new Date(d.created_at).toLocaleDateString('ar-EG')}</td>
-          </tr>`).join('') : '<tr><td colspan="8" style="text-align:center;padding:2rem">لا توجد تبرعات مسجلة.</td></tr>'}
+            <td>
+              <form action="/api/donations/status/${d.id}" method="POST" style="display:inline">
+                <input type="hidden" name="status" value="${d.status === 'completed' ? 'pending' : 'completed'}">
+                <button type="submit" class="btn btn-sm ${d.status === 'completed' ? 'btn-ghost' : 'btn-primary'}" style="font-size:.8rem" title="تغيير الحالة">
+                  <i class="fas ${d.status === 'completed' ? 'fa-times' : 'fa-check'}"></i>
+                  ${d.status === 'completed' ? 'إلغاء التأكيد' : 'تأكيد'}
+                </button>
+              </form>
+            </td>
+          </tr>`).join('') : '<tr><td colspan="9" style="text-align:center;padding:2rem">لا توجد تبرعات مسجلة.</td></tr>'}
         </tbody>
       </table>
     </div>

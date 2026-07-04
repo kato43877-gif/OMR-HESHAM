@@ -92,7 +92,7 @@ export const home = ({ campaigns = [], news = [], stories = [], stats = { total_
       <p class="lead reveal d2">اختر الحملة التي تُلامس قلبك، وتابع أثر تبرّعك خطوةً بخطوة حتى يصل إلى مستحقيه.</p>
     </div>
     <div class="grid cols-3">
-      ${campaigns.length ? campaigns.slice(0, 3).map((c: any, i: number) => `
+      ${campaigns?.length ? campaigns.slice(0, 3).map((c: any, i: number) => `
       <article class="campaign reveal d${i + 1}">
         <div class="campaign-media">
           <img src="${c.image_url || '/static/img/placeholder.jpg'}" alt="${c.title}" loading="lazy">
@@ -147,7 +147,7 @@ export const home = ({ campaigns = [], news = [], stories = [], stats = { total_
       <h2 class="h-xl reveal d1" style="margin-top:.8rem">حياةٌ <span class="text-grad-emerald">تغيّرت</span> بفضل عطائكم</h2>
     </div>
     <div class="grid cols-3">
-      ${stories.length ? stories.map((s: any, i: number) => `
+      ${stories?.length ? stories.map((s: any, i: number) => `
       <figure class="testi reveal d${i + 1}">
         <span class="quote-mark">”</span>
         <div class="stars" style="margin-bottom:.8rem">${'<i class="fas fa-star"></i>'.repeat(s.rating || 5)}</div>
@@ -170,7 +170,7 @@ export const home = ({ campaigns = [], news = [], stories = [], stats = { total_
       <h2 class="h-xl reveal d1" style="margin-top:.8rem">جديد <span class="text-grad-blue">المؤسسة</span></h2>
     </div>
     <div class="grid cols-3">
-      ${news.length ? news.slice(0, 3).map((n: any, i: number) => `
+      ${news?.length ? news.slice(0, 3).map((n: any, i: number) => `
       <article class="news-card reveal d${i + 1}">
         <div class="news-media"><img src="${n.image_url || '/static/img/placeholder.jpg'}" alt="${n.title}" loading="lazy"><span class="chip chip-gold" style="position:absolute;top:1rem;inset-inline-start:1rem">${n.category}</span></div>
         <div class="news-body">

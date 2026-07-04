@@ -203,8 +203,11 @@ export const page = (opts: PageOpts, content: string) => `<!DOCTYPE html>
   ${nav(opts.active, opts.user)}
   <main>${content}</main>
   ${footer(opts.active)}
+  <script>window.__USER = ${JSON.stringify(opts.user || null)};</script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/static/app.js"></script>
+  <script src="/static/presence.js"></script>
 </body>
 </html>`
 

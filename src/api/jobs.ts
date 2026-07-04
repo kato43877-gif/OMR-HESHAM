@@ -40,6 +40,40 @@ jobs.post('/add', async (c) => {
   return c.redirect('/dashboard/jobs?success=1')
 })
 
+jobs.post('/edit/:id', async (c) => {
+  const supabase = getSupabaseFromContext(c)
+  const id = c.req.param('id')
+  const body = await c.req.parseBody()
+  
+  const { error } = await supabase
+    .from('jobs')
+    .update({
+      title: body.title,
+      department: body.department || null,
+      job_type: body.job_type || null,
+      location: body.location || null,
+      description: body.description || null,
+      is_active: body.is_active === 'true'
+    })
+    .eq('id', id)
+
+  if (error) return c.redirect('/dashboard/jobs?error=1')
+  return c.redirect('/dashboard/jobs?success=1')
+})
+
+jobs.post('/delete/:id', async (c) => {
+  const supabase = getSupabaseFromContext(c)
+  const id = c.req.param('id')
+  
+  const { error } = await supabase
+    .from('jobs')
+    .delete()
+    .eq('id', id)
+
+  if (error) return c.redirect('/dashboard/jobs?error=1')
+  return c.redirect('/dashboard/jobs?success=1')
+})
+
 // Apply for a job (accepts form data from browser)
 jobs.post('/apply', async (c) => {
   const supabase = getSupabaseFromContext(c)

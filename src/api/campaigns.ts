@@ -59,3 +59,39 @@ campaigns.post('/add', async (c) => {
   
   return c.redirect('/dashboard/campaigns?success=1')
 })
+
+// Edit campaign
+campaigns.post('/edit/:id', async (c) => {
+  const supabase = getSupabaseFromContext(c)
+  const id = c.req.param('id')
+  const body = await c.req.parseBody()
+  
+  const { error } = await supabase
+    .from('campaigns')
+    .update({
+      title: body.title,
+      category: body.category,
+      goal: Number(body.goal),
+      image_url: body.image_url || null,
+      is_urgent: body.is_urgent === 'true',
+      description: body.description || null
+    })
+    .eq('id', id)
+
+  if (error) return c.redirect('/dashboard/campaigns?error=1')
+  return c.redirect('/dashboard/campaigns?success=1')
+})
+
+// Delete campaign
+campaigns.post('/delete/:id', async (c) => {
+  const supabase = getSupabaseFromContext(c)
+  const id = c.req.param('id')
+  
+  const { error } = await supabase
+    .from('campaigns')
+    .delete()
+    .eq('id', id)
+
+  if (error) return c.redirect('/dashboard/campaigns?error=1')
+  return c.redirect('/dashboard/campaigns?success=1')
+})

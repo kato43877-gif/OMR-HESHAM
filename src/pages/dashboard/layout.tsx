@@ -11,8 +11,9 @@ const dashNav = (active: string) => `
     <a href="/dashboard/contacts" class="${active === 'contacts' ? 'active' : ''}"><i class="fas fa-envelope"></i> رسائل التواصل</a>
     <a href="/dashboard/news" class="${active === 'news' ? 'active' : ''}"><i class="fas fa-newspaper"></i> الأخبار والمقالات</a>
     <a href="/dashboard/events" class="${active === 'events' ? 'active' : ''}"><i class="fas fa-calendar-check"></i> الفعاليات</a>
-    <a href="/dashboard/stories" class="${active === 'stories' ? 'active' : ''}"><i class="fas fa-star"></i> قصص النجاح</a>
-    <a href="/dashboard/jobs" class="${active === 'jobs' ? 'active' : ''}"><i class="fas fa-briefcase"></i> الوظائف</a>
+    <a href="/dashboard/stories" class="${active === 'stories' ? 'active' : ''}"><i class="fas fa-heart"></i> <span>قصص النجاح</span></a>
+    <a href="/dashboard/newsletter" class="${active === 'newsletter' ? 'active' : ''}"><i class="fas fa-envelope-open-text"></i> <span>النشرة البريدية</span></a>
+    <a href="/dashboard/jobs" class="${active === 'jobs' ? 'active' : ''}"><i class="fas fa-briefcase"></i> <span>الوظائف</span></a>
     <a href="/dashboard/users" class="${active === 'users' ? 'active' : ''}"><i class="fas fa-users-gear"></i> المسجلين</a>
     <a href="/api/auth/logout" style="margin-top:1.5rem;color:#ff8a80"><i class="fas fa-right-from-bracket"></i> تسجيل الخروج</a>
   </nav>
@@ -48,7 +49,10 @@ export const dashboardLayout = (active: string, title: string, content: string) 
     </div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- In dashboard we also need user context, but we might not have it passed down here directly. Let's see if we can fetch it or if we can pass it down. Wait, dashboardLayout doesn't take user. -->
   <script src="/static/app.js"></script>
+  <script src="/static/presence.js"></script>
   <script>
     (function(){
       const p = new URLSearchParams(window.location.search);

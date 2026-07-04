@@ -9,6 +9,7 @@ import { events } from './events'
 import { stories } from './stories'
 import { jobs } from './jobs'
 import { newsletter } from './newsletter'
+import { profile } from './profile'
 
 const api = new Hono()
 
@@ -22,5 +23,6 @@ api.route('/events', events)
 api.route('/stories', stories)
 api.route('/jobs', jobs)
 api.route('/newsletter', newsletter)
+api.route('/profile', profile)
 
 export { api }

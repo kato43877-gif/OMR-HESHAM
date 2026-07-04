@@ -5,7 +5,14 @@ export const dashUsers = (users: any[]) => dashboardLayout(
   'المسجلين',
   `
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
-    <p style="color:var(--muted)">إدارة المستخدمين المسجلين وصلاحياتهم.</p>
+    <p style="color:var(--muted)">إدارة المستخدمين المسجلين وصلاحياتهم، ومتابعة المتواجدين حالياً.</p>
+  </div>
+
+  <div class="panel" style="margin-bottom:2rem;border:1px solid rgba(46,204,113,.2);background:rgba(46,204,113,.02)">
+    <h3 style="margin-bottom:1rem;display:flex;align-items:center;gap:.5rem"><i class="fas fa-circle" style="color:#2ecc71;font-size:.6rem;animation:pulse 2s infinite"></i> المتواجدون الآن</h3>
+    <div id="onlineUsersList" style="display:flex;gap:1rem;flex-wrap:wrap">
+      <p style="color:var(--muted)">جاري جلب بيانات المتواجدين...</p>
+    </div>
   </div>
 
   <div class="panel">
@@ -40,5 +47,30 @@ export const dashUsers = (users: any[]) => dashboardLayout(
       </table>
     </div>
   </div>
+  <script>
+    window.addEventListener('onlineUsersSync', (e) => {
+      const users = e.detail;
+      const list = document.getElementById('onlineUsersList');
+      if (!list) return;
+      if (!users || users.length === 0) {
+        list.innerHTML = '<p style="color:var(--muted)">لا يوجد مستخدمون متواجدون الآن.</p>';
+        return;
+      }
+      
+      list.innerHTML = users.map(u => {
+        const avatarHtml = u.avatar 
+          ? '<img src="' + u.avatar + '" alt="" style="width:28px;height:28px;border-radius:50%;object-fit:cover">' 
+          : '<span class="avatar placeholder" style="width:28px;height:28px;font-size:.7rem">' + (u.name ? u.name.charAt(0) : 'U') + '</span>';
+        
+        return '<div style="display:flex;align-items:center;gap:.6rem;background:#fff;padding:.5rem 1rem;border-radius:2rem;box-shadow:0 2px 8px rgba(0,0,0,.04);border:1px solid rgba(0,0,0,.04)">' +
+                 avatarHtml +
+                 '<div>' +
+                   '<div style="font-weight:700;font-size:.85rem">' + (u.name || 'بدون اسم') + '</div>' +
+                   '<div style="font-size:.7rem;color:var(--muted)">' + (u.role === 'admin' ? 'مدير' : 'مستخدم') + '</div>' +
+                 '</div>' +
+               '</div>';
+      }).join('');
+    });
+  </script>
   `
 )

@@ -53,3 +53,36 @@ news.post('/add', async (c) => {
   
   return c.redirect('/dashboard/news?success=1')
 })
+
+news.post('/edit/:id', async (c) => {
+  const supabase = getSupabaseFromContext(c)
+  const id = c.req.param('id')
+  const body = await c.req.parseBody()
+  
+  const { error } = await supabase
+    .from('news')
+    .update({
+      title: body.title,
+      category: body.category || null,
+      excerpt: body.excerpt,
+      content: body.content,
+      image_url: body.image_url || null
+    })
+    .eq('id', id)
+
+  if (error) return c.redirect('/dashboard/news?error=1')
+  return c.redirect('/dashboard/news?success=1')
+})
+
+news.post('/delete/:id', async (c) => {
+  const supabase = getSupabaseFromContext(c)
+  const id = c.req.param('id')
+  
+  const { error } = await supabase
+    .from('news')
+    .delete()
+    .eq('id', id)
+
+  if (error) return c.redirect('/dashboard/news?error=1')
+  return c.redirect('/dashboard/news?success=1')
+})
