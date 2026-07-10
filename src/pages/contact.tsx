@@ -9,9 +9,9 @@ export const contactPage = (success = false, errorMsg: string | null = null) => 
   <div class="wrap">
     <div class="grid cols-3" style="margin-bottom:3rem">
       ${[
-        { i: 'fa-location-dot', c: 'ic-blue', t: 'العنوان', d: 'القاهرة، جمهورية مصر العربية<br>يتم التحديث' },
-        { i: 'fa-phone-volume', c: 'ic-emerald', t: 'الهاتف', d: 'يتم التحديث' },
-        { i: 'fa-envelope-open-text', c: 'ic-gold', t: 'البريد', d: 'يتم التحديث' },
+        { i: 'fa-location-dot', c: 'ic-blue', t: 'العنوان', d: 'كفر العنانية، الدقهلية، جمهورية مصر العربية' },
+        { i: 'fa-phone-volume', c: 'ic-emerald', t: 'الهاتف', d: '01060920249' },
+        { i: 'fa-envelope-open-text', c: 'ic-gold', t: 'البريد', d: 'info@omarhesham.org' },
       ].map((m, i) => `
       <article class="card reveal d${i + 1}" style="text-align:center">
         <div class="card-icon ${m.c}" style="margin-inline:auto"><i class="fas ${m.i}"></i></div>
@@ -41,7 +41,7 @@ export const contactPage = (success = false, errorMsg: string | null = null) => 
 
       <div class="reveal d1">
         <div class="frame" style="aspect-ratio:4/3;background:var(--grad-hero);display:grid;place-items:center;color:#fff;text-align:center">
-          <div><i class="fas fa-map-location-dot" style="font-size:3rem;color:var(--gold-400)"></i><p style="margin-top:1rem;font-weight:800">القاهرة · مدينة نصر</p><p style="color:rgba(255,255,255,.7);font-size:.9rem">موقعنا على الخريطة</p></div>
+          <div><i class="fas fa-map-location-dot" style="font-size:3rem;color:var(--gold-400)"></i><p style="margin-top:1rem;font-weight:800">كفر العنانية · الدقهلية</p><p style="color:rgba(255,255,255,.7);font-size:.9rem">موقعنا على الخريطة</p></div>
         </div>
         <div class="card" style="margin-top:1.4rem">
           <h3 style="margin-bottom:1rem"><i class="fas fa-clock" style="color:var(--blue-600)"></i> ساعات العمل</h3>

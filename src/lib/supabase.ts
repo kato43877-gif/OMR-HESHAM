@@ -54,6 +54,21 @@ export const createSupabaseAuth = (env: Env, accessToken: string): SupabaseClien
 }
 
 /**
+ * Helper to extract environment variables with fallback to process.env (useful for Vercel/Node)
+ */
+export const getEnv = (c: any): Env => {
+  const env = c?.env || {}
+  const glob = globalThis as any
+  const proc = typeof glob.process !== 'undefined' ? glob.process.env : {}
+  return {
+    SUPABASE_URL: env.SUPABASE_URL || proc.SUPABASE_URL || '',
+    SUPABASE_KEY: env.SUPABASE_KEY || proc.SUPABASE_KEY || '',
+    SUPABASE_SERVICE_ROLE_KEY: env.SUPABASE_SERVICE_ROLE_KEY || proc.SUPABASE_SERVICE_ROLE_KEY
+  }
+}
+
+
+/**
  * Legacy helper — kept for backwards compatibility.
  * Creates a client with optional access token.
  */
@@ -77,12 +92,13 @@ export const getSupabaseFromContext = (c: any): SupabaseClient => {
   const cookieToken = getCookie(c, 'sb-access-token')
   const token = bearerToken || cookieToken
 
-  return getSupabase(c.env, token)
+  return getSupabase(getEnv(c), token)
 }
 
 /**
  * Helper to get an admin supabase client from Hono context.
  */
 export const getSupabaseAdminFromContext = (c: any): SupabaseClient => {
-  return createSupabaseAdmin(c.env)
+  return createSupabaseAdmin(getEnv(c))
 }
+

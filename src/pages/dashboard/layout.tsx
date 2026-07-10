@@ -157,6 +157,12 @@ export const dashboardLayout = (active: string, title: string, content: string) 
     .qs-value { font-weight: 800; font-size: 1.1rem; }
     .qs-label { font-size: .72rem; color: var(--muted); font-weight: 600; }
 
+    .dash-overlay {
+      position: fixed; inset: 0; background: rgba(6,16,32,.55); backdrop-filter: blur(4px);
+      z-index: 55; opacity: 0; visibility: hidden; transition: .3s var(--ease);
+    }
+    .dash-overlay.show { opacity: 1; visibility: visible; }
+
     /* Responsive */
     @media (max-width: 980px) {
       .dash { grid-template-columns: 1fr; }
@@ -174,10 +180,11 @@ export const dashboardLayout = (active: string, title: string, content: string) 
 <body>
   <div class="dash">
     ${dashNav(active)}
+    <div class="dash-overlay" id="dashOverlay" onclick="document.getElementById('dashSide').classList.remove('open'); document.getElementById('dashOverlay').classList.remove('show')"></div>
     <div class="dash-main">
       <div class="dash-topbar">
         <div style="display:flex;align-items:center;gap:1rem">
-          <button class="burger" id="dashBurger" style="display:none" onclick="document.getElementById('dashSide').classList.toggle('open')"><span></span></button>
+          <button class="burger" id="dashBurger" style="display:none" onclick="document.getElementById('dashSide').classList.toggle('open'); document.getElementById('dashOverlay').classList.toggle('show')"><span></span></button>
           <h1>${title}</h1>
         </div>
         <div style="display:flex;gap:.6rem;align-items:center">

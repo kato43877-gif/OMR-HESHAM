@@ -1,7 +1,16 @@
 import { pageHero, ctaBanner } from '../layout'
 import { img } from '../data'
 
-const photos: any[] = []
+const photos = [
+  { src: '/static/img/gallery-1.jpg', t: 'مشروع الأضاحي وتوزيع اللحوم', cat: 'ميدان' },
+  { src: '/static/img/gallery-2.jpg', t: 'توزيع الكراتين والمساعدات الغذائية', cat: 'غذاء' },
+  { src: '/static/img/gallery-3.jpg', t: 'دعم عيادة الأنف والأذن والحنجرة', cat: 'صحة' },
+  { src: '/static/img/gallery-4.jpg', t: 'تكريم المتفوقين ودعم التعليم', cat: 'تعليم' },
+  { src: '/static/img/gallery-5.jpg', t: 'حلقات تحفيظ القرآن الكريم للأطفال', cat: 'تعليم' },
+  { src: '/static/img/gallery-6.jpg', t: 'أنشطة وفعاليات تطوعية مع الشباب', cat: 'ميدان' },
+  { src: '/static/img/gallery-7.jpg', t: 'زيارات المرضى وتوفير الدعم الصحي', cat: 'صحة' },
+  { src: '/static/img/gallery-8.jpg', t: 'المبادرات الرمضانية وتوزيع الوجبات', cat: 'غذاء' },
+]
 
 export const galleryPage = () => pageHero(
   'معرض الصور',
@@ -20,11 +29,11 @@ export const galleryPage = () => pageHero(
       </div>
     </div>
     <div class="masonry reveal">
-      ${photos.length > 0 ? photos.map((p, i) => `
-      <div class="g-item">
-        <img src="${img(p.id, 600, p.h)}" alt="${p.t}" loading="lazy">
+      ${photos.map((p, i) => `
+      <div class="g-item" data-cat="${p.cat}">
+        <img src="${p.src}" alt="${p.t}" loading="lazy">
         <div class="g-overlay"><span><i class="fas fa-camera"></i> ${p.t}</span></div>
-      </div>`).join('') : '<p style="text-align:center;grid-column:1/-1;color:var(--muted);padding:4rem 0;font-size:1.1rem">سيتم إضافة صور المعرض قريباً.</p>'}
+      </div>`).join('')}
     </div>
   </div>
 </section>

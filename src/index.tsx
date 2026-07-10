@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { getCookie } from 'hono/cookie'
 import { api } from './api'
-import { getSupabaseFromContext, getSupabaseAdminFromContext } from './lib/supabase'
+import { getSupabaseFromContext, getSupabaseAdminFromContext, getEnv } from './lib/supabase'
 import { page } from './layout'
 import { home } from './pages/home'
 import { about } from './pages/about'
@@ -64,7 +64,7 @@ app.use('*', async (c, next) => {
 import { Env } from './lib/supabase'
 
 app.get('/api/config', (c) => {
-  const env = c.env as Env;
+  const env = getEnv(c)
   return c.json({
     supabaseUrl: env.SUPABASE_URL,
     supabaseKey: env.SUPABASE_KEY,
