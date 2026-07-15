@@ -17,6 +17,11 @@
     "googleapis": "^173.0.0",
     "hono": "^4.9.6"
   },
+  "overrides": {
+    "jwks-rsa": {
+      "jose": "4.15.9"
+    }
+  },
   "devDependencies": {
     "@hono/vite-build": "^1.11.1",
     "@hono/vite-dev-server": "^0.26.1",
