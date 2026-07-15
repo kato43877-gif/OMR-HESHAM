@@ -58,10 +58,17 @@ app.get('/api/config', (c) => {
   const glob = globalThis as any
   const procEnv = typeof glob.process !== 'undefined' ? glob.process.env : {}
 
+  const hasAdminSdk = Boolean(
+    (env.FIREBASE_PROJECT_ID || procEnv.FIREBASE_PROJECT_ID) &&
+    (env.FIREBASE_CLIENT_EMAIL || procEnv.FIREBASE_CLIENT_EMAIL) &&
+    (env.FIREBASE_PRIVATE_KEY || procEnv.FIREBASE_PRIVATE_KEY)
+  )
+
   return c.json({
     apiKey: env.FIREBASE_API_KEY || procEnv.FIREBASE_API_KEY || '',
     authDomain: env.FIREBASE_AUTH_DOMAIN || procEnv.FIREBASE_AUTH_DOMAIN || '',
     projectId: env.FIREBASE_PROJECT_ID || procEnv.FIREBASE_PROJECT_ID || '',
+    hasAdminSdk,
     user: (c as any).get('user') || null
   })
 })

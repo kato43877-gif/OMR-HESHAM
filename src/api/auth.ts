@@ -65,8 +65,8 @@ auth.post('/session', async (c) => {
 
     return c.json({ success: true, role, message: 'تم تسجيل الدخول بنجاح' })
   } catch (error: any) {
-    console.error('[Session Auth Error]', error.message)
-    return c.json({ error: 'فشل في إنشاء الجلسة، رمز غير صالح' }, 401)
+    console.error('[Session Auth Error]', error.message, error.stack)
+    return c.json({ error: `فشل في إنشاء الجلسة، رمز غير صالح: ${error.message} (${error.code || 'NO_CODE'})` }, 401)
   }
 })
 
