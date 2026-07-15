@@ -420,7 +420,19 @@ body.dark .profile-card-modern {
   color: var(--muted);
 }
 
+.profile-layout {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 30px;
+  background: transparent;
+  padding: 0;
+}
+
 @media(max-width: 991px) {
+  .profile-layout {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
   .profile-header {
     padding: 35px;
     flex-direction: column;
@@ -432,17 +444,86 @@ body.dark .profile-card-modern {
   }
 }
 @media(max-width: 767px) {
-  .profile-quick-stats {
-    grid-template-columns: 1fr;
+  .profile-header {
+    padding: 30px 20px;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 25px;
   }
   .profile-user-info {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
+    text-align: center;
     gap: 15px;
+  }
+  .profile-user-details h1 {
+    font-size: 1.8rem;
+    margin-bottom: 12px;
+  }
+  .profile-user-details div {
+    justify-content: center;
+  }
+  .profile-quick-stats {
+    width: 100%;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .profile-stat-box {
+    padding: 12px 6px;
+    border-radius: 14px;
+  }
+  .profile-stat-box span {
+    font-size: 0.65rem;
+    margin-bottom: 3px;
+  }
+  .profile-stat-box strong {
+    font-size: 1.1rem;
   }
   .profile-vol-incentive {
     flex-direction: column;
     text-align: center;
+    padding: 20px;
+    gap: 15px;
+  }
+  .profile-vol-incentive-text h4 {
+    font-size: 1.05rem;
+  }
+  .profile-vol-incentive-text p {
+    font-size: 0.8rem;
+  }
+  .profile-donations-table thead {
+    display: none;
+  }
+  .profile-donations-table tbody,
+  .profile-donations-table tr {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+  .profile-donations-table tr {
+    background: rgba(9, 45, 41, 0.02);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 15px;
+    margin-bottom: 12px;
+    gap: 8px;
+  }
+  body.dark .profile-donations-table tr {
+    background: rgba(255, 255, 255, 0.02);
+  }
+  .profile-donations-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 !important;
+    border: none !important;
+    font-size: 0.88rem;
+  }
+  .profile-donations-table td:before {
+    content: attr(data-label);
+    font-weight: 800;
+    color: var(--muted);
   }
 }
 

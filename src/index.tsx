@@ -710,11 +710,29 @@ function Login({ firebaseConfig }: { firebaseConfig: any }) {
           });
           const data = await res.json();
           if (data.success) {
-            if (data.role === 'admin') {
-              window.location.href = '/';
-            } else {
-              window.location.href = '/profile';
+            localStorage.setItem('just_logged_in', 'true');
+            localStorage.setItem('user_display_name', result.user.displayName || 'صديق المؤسسة');
+            
+            const container = document.querySelector('.auth-form-container');
+            if (container) {
+              container.innerHTML = "<div style=\"text-align:center; padding: 2.5rem 0; display:flex; flex-direction:column; align-items:center; gap:1.5rem; animation: fadeIn 0.6s var(--ease)\">" +
+                "<div style=\"width:70px; height:70px; border-radius:50%; background:var(--gold); color:var(--ink); display:grid; place-items:center; font-size:2rem; box-shadow:0 10px 25px rgba(214,166,75,0.3)\">" +
+                  "<i class=\"fa-solid fa-hands-praying\"></i>" +
+                "</div>" +
+                "<div>" +
+                  "<h2 style=\"margin:0 0 8px; font-size:1.8rem; font-weight:800; color:var(--text)\">أهلاً بك، " + (result.user.displayName || 'صديقنا') + "! ✦</h2>" +
+                  "<p style=\"color:var(--muted); margin:0; font-size:0.95rem\">تم تسجيل الدخول بنجاح.</p>" +
+                "</div>" +
+                "<div style=\"font-size:0.88rem; color:var(--emerald); font-weight:800; display:flex; align-items:center; gap:8px; margin-top:0.5rem\">" +
+                  "<i class=\"fa-solid fa-circle-notch fa-spin\"></i>" +
+                  "<span>جارٍ توجيهك إلى حسابك...</span>" +
+                "</div>" +
+              "</div>";
             }
+            
+            setTimeout(() => {
+              window.location.href = data.role === 'admin' ? '/' : '/profile';
+            }, 1800);
           } else {
             errorBox.textContent = 'حدث خطأ في النظام: ' + (data.error || 'فشل التوثيق');
             errorBox.style.display = 'block';
@@ -812,7 +830,7 @@ function Profile({ user, donations = [], volunteer }: { user: any, donations?: a
       </div>
 
       {/* Main Profile Grid Layout */}
-      <div class="donate-layout" style="grid-template-columns: 1.6fr 1fr; gap: 30px; background: transparent; padding: 0">
+      <div class="profile-layout">
 
         {/* Right Column: History & Activities */}
         <div style="display: flex; flex-direction: column; gap: 25px">
@@ -830,7 +848,7 @@ function Profile({ user, donations = [], volunteer }: { user: any, donations?: a
               </div>
             ) : (
               <div class="dash-table" style="box-shadow:none; padding:0; background:transparent">
-                <table style="width:100%; border-collapse:collapse">
+                <table class="profile-donations-table" style="width:100%; border-collapse:collapse">
                   <thead>
                     <tr style="border-bottom: 2px solid var(--line)">
                       <th style="text-align:right; padding:15px; font-weight:800; color:var(--text)">الحملة والمجال</th>
@@ -845,10 +863,10 @@ function Profile({ user, donations = [], volunteer }: { user: any, donations?: a
                       const isCompleted = d.status === 'completed'
 
                       return <tr style="border-bottom:1px solid var(--line)">
-                        <td style="padding:15px; font-weight: 600; color: var(--text)">{d.campaign_title || 'الصندوق العام'}</td>
-                        <td style="padding:15px; font-weight:bold; color:var(--emerald)">{Number(d.amount).toLocaleString('ar-EG')} ج.م</td>
-                        <td style="padding:15px; color:var(--muted); font-size: 0.9rem">{date}</td>
-                        <td style="padding:15px">
+                        <td data-label="الحملة والمجال" style="padding:15px; font-weight: 600; color: var(--text)">{d.campaign_title || 'الصندوق العام'}</td>
+                        <td data-label="المبلغ" style="padding:15px; font-weight:bold; color:var(--emerald)">{Number(d.amount).toLocaleString('ar-EG')} ج.م</td>
+                        <td data-label="التاريخ" style="padding:15px; color:var(--muted); font-size: 0.9rem">{date}</td>
+                        <td data-label="الحالة" style="padding:15px">
                           <span style={`font-size:.78rem; padding:6px 12px; border-radius:8px; font-weight:800; background:${isCompleted ? 'rgba(22,138,112,.09)' : 'rgba(245,124,0,.09)'}; color:${isCompleted ? 'var(--emerald)' : 'var(--gold)'}; border: 1px solid ${isCompleted ? 'rgba(22,138,112,.15)' : 'rgba(245,124,0,.15)'}`}>
                             {isCompleted ? 'مكتمل' : 'قيد المراجعة'}
                           </span>
@@ -937,6 +955,53 @@ function Profile({ user, donations = [], volunteer }: { user: any, donations?: a
 
       </div>
     </section>
+
+    <script dangerouslySetInnerHTML={{
+      __html: `
+      (function() {
+        if (localStorage.getItem('just_logged_in') === 'true') {
+          const userName = localStorage.getItem('user_display_name') || 'صديقنا العزيز';
+          localStorage.removeItem('just_logged_in');
+          localStorage.removeItem('user_display_name');
+          
+          // Load confetti script
+          const script = document.createElement('script');
+          script.src = 'https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js';
+          script.onload = function() {
+            const duration = 2.5 * 1000;
+            const end = Date.now() + duration;
+
+            (function frame() {
+              confetti({
+                particleCount: 5,
+                angle: 60,
+                spread: 55,
+                origin: { x: 0, y: 0.8 }
+              });
+              confetti({
+                particleCount: 5,
+                angle: 120,
+                spread: 55,
+                origin: { x: 1, y: 0.8 }
+              });
+
+              if (Date.now() < end) {
+                requestAnimationFrame(frame);
+              }
+            }());
+          };
+          document.head.appendChild(script);
+          
+          // Show toast after a slight delay
+          setTimeout(() => {
+            if (window.showToast) {
+              window.showToast("أهلاً بك معنا يا " + userName + " في عائلة المؤسسة! ✦", "subscribe");
+            }
+          }, 800);
+        }
+      })();
+      `
+    }} />
   </Layout>
 }
 
