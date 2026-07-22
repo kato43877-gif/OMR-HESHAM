@@ -73,18 +73,23 @@ export function DashOverview({ stats, recentDonations = [] }: { stats: any, rece
     ['إجمالي المصروفات (المنصرف)', `${(stats.total_expenses || 0).toLocaleString('ar-EG')} ج.م`, 'fa-arrow-up', '#e86f51'],
     ['التبرعات أونلاين', `${(stats.total_donations || 0).toLocaleString('ar-EG')} ج.م`, 'fa-hand-holding-heart', 'var(--gold-600)'],
     ['الحملات النشطة', `${stats.total_campaigns || 0}`, 'fa-bullseye', 'var(--blue-600)'],
-    ['المتبرعون المسجلون', `${stats.total_donors || 0}`, 'fa-users', 'var(--emerald-600)'],
-    ['طلبات التطوع', `${stats.total_volunteers || 0}`, 'fa-people-group', 'var(--gold-600)']
+    ['المتبرعون المسجلون', `${stats.total_donors || 0}`, 'fa-users', '#3b82f6'],
+    ['طلبات التطوع', `${stats.total_volunteers || 0}`, 'fa-people-group', '#8b5cf6']
   ]
 
-  // Calculate proportional bar heights for the visual chart
-  const maxVal = Math.max(stats.total_income || 1, stats.total_expenses || 1, stats.total_donations || 1, 1)
-  const incHeight = Math.min(100, Math.max(15, Math.round(((stats.total_income || 0) / maxVal) * 100)))
-  const expHeight = Math.min(100, Math.max(15, Math.round(((stats.total_expenses || 0) / maxVal) * 100)))
-  const donHeight = Math.min(100, Math.max(15, Math.round(((stats.total_donations || 0) / maxVal) * 100)))
+  // Calculate proportional bar heights relative to maximum values
+  const maxFin = Math.max(stats.total_income || 1, stats.total_expenses || 1, stats.total_donations || 1, 1)
+  const maxAct = Math.max(stats.total_donors || 1, stats.total_volunteers || 1, stats.total_campaigns || 1, 1)
+
+  const incH = Math.min(100, Math.max(18, Math.round(((stats.total_income || 0) / maxFin) * 100)))
+  const expH = Math.min(100, Math.max(18, Math.round(((stats.total_expenses || 0) / maxFin) * 100)))
+  const donH = Math.min(100, Math.max(18, Math.round(((stats.total_donations || 0) / maxFin) * 100)))
+  const usrH = Math.min(100, Math.max(18, Math.round(((stats.total_donors || 0) / maxAct) * 100)))
+  const volH = Math.min(100, Math.max(18, Math.round(((stats.total_volunteers || 0) / maxAct) * 100)))
+  const cmpH = Math.min(100, Math.max(18, Math.round(((stats.total_campaigns || 0) / maxAct) * 100)))
 
   return <>
-    <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem">
+    <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1rem">
       {items.map(k => (
         <article style="background: var(--paper); border: 1px solid var(--line); border-radius: 18px; padding: 1.2rem; display: flex; flex-direction: column; justify-content: space-between">
           <div style="display: flex; align-items: center; justify-content: space-between">
@@ -96,46 +101,85 @@ export function DashOverview({ stats, recentDonations = [] }: { stats: any, rece
       ))}
     </div>
 
-    {/* Financial Flow Chart */}
+    {/* Advanced Multi-Metric Chart */}
     <section class="chart-panel" style="margin-top:2rem">
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; border-bottom:1px solid var(--line); padding-bottom:1rem">
         <div>
-          <h3 style="font-size:1.2rem; font-weight:800; color:var(--text)">المخطط البياني للتدفقات المالية</h3>
-          <p style="font-size:.82rem; color:var(--muted)">مقارنة إجمالي الإيرادات الواردة بالمصروفات والتبرعات الإلكترونية</p>
+          <h3 style="font-size:1.3rem; font-weight:900; color:var(--text); display:flex; align-items:center; gap:10px">
+            {icon('fa-chart-column')} لوحة التحليلات والمؤشرات الشاملة
+          </h3>
+          <p style="font-size:.84rem; color:var(--muted); margin-top:4px">مقارنة شاملة بين التدفقات المالية والأنشطة والمستخدمين والمتطوعين</p>
         </div>
-        <div style="display:flex; gap:1rem; font-size:.8rem; font-weight:700">
-          <span style="display:inline-flex; align-items:center; gap:6px; color:var(--emerald-600)">
-            <i style="width:12px; height:12px; border-radius:3px; background:var(--emerald-600); display:inline-block"></i> الإيرادات
+        <div style="display:flex; gap:.8rem; flex-wrap:wrap; font-size:.78rem; font-weight:800">
+          <span style="display:inline-flex; align-items:center; gap:6px; color:#10b981; background:rgba(16,185,129,.1); padding:4px 10px; border-radius:8px">
+            <i style="width:10px; height:10px; border-radius:50%; background:#10b981"></i> الإيرادات
           </span>
-          <span style="display:inline-flex; align-items:center; gap:6px; color:#e86f51">
-            <i style="width:12px; height:12px; border-radius:3px; background:#e86f51; display:inline-block"></i> المصروفات
+          <span style="display:inline-flex; align-items:center; gap:6px; color:#f43f5e; background:rgba(244,63,94,.1); padding:4px 10px; border-radius:8px">
+            <i style="width:10px; height:10px; border-radius:50%; background:#f43f5e"></i> المصروفات
           </span>
-          <span style="display:inline-flex; align-items:center; gap:6px; color:var(--gold-600)">
-            <i style="width:12px; height:12px; border-radius:3px; background:var(--gold-600); display:inline-block"></i> التبرعات أونلاين
+          <span style="display:inline-flex; align-items:center; gap:6px; color:#f59e0b; background:rgba(245,158,11,.1); padding:4px 10px; border-radius:8px">
+            <i style="width:10px; height:10px; border-radius:50%; background:#f59e0b"></i> تبرعات الموقع
+          </span>
+          <span style="display:inline-flex; align-items:center; gap:6px; color:#3b82f6; background:rgba(59,130,246,.1); padding:4px 10px; border-radius:8px">
+            <i style="width:10px; height:10px; border-radius:50%; background:#3b82f6"></i> المتبرعون والأعضاء
+          </span>
+          <span style="display:inline-flex; align-items:center; gap:6px; color:#8b5cf6; background:rgba(139,92,246,.1); padding:4px 10px; border-radius:8px">
+            <i style="width:10px; height:10px; border-radius:50%; background:#8b5cf6"></i> المتطوعون
+          </span>
+          <span style="display:inline-flex; align-items:center; gap:6px; color:#06b6d4; background:rgba(6,182,212,.1); padding:4px 10px; border-radius:8px">
+            <i style="width:10px; height:10px; border-radius:50%; background:#06b6d4"></i> الحملات
           </span>
         </div>
       </div>
 
-      <div class="fake-chart" style="margin-top:2rem">
+      {/* Main Multi-Metric Bar Graph */}
+      <div class="fake-chart">
         <div class="bar-group">
           <div class="bar-container">
-            <i class="inc-bar" style={`--h:${incHeight}%; height:${incHeight}%; background:linear-gradient(180deg, var(--emerald-600), #0d5c4b)`} title={`إجمالي الإيرادات: ${(stats.total_income || 0).toLocaleString('ar-EG')} ج.م`}></i>
+            <span class="bar-val-badge" style="color:#10b981">{(stats.total_income || 0).toLocaleString('ar-EG')} ج.م</span>
+            <i class="inc-bar" style={`--h:${incH}%; height:${incH}%`} title={`إجمالي الإيرادات: ${(stats.total_income || 0).toLocaleString('ar-EG')} ج.م`}></i>
           </div>
-          <span>الإيرادات (الوارد)</span>
+          <span class="bar-label">{icon('fa-arrow-down')} الإيرادات</span>
         </div>
 
         <div class="bar-group">
           <div class="bar-container">
-            <i class="exp-bar" style={`--h:${expHeight}%; height:${expHeight}%; background:linear-gradient(180deg, #e86f51, #b8472d)`} title={`إجمالي المصروفات: ${(stats.total_expenses || 0).toLocaleString('ar-EG')} ج.م`}></i>
+            <span class="bar-val-badge" style="color:#f43f5e">{(stats.total_expenses || 0).toLocaleString('ar-EG')} ج.م</span>
+            <i class="exp-bar" style={`--h:${expH}%; height:${expH}%`} title={`إجمالي المصروفات: ${(stats.total_expenses || 0).toLocaleString('ar-EG')} ج.م`}></i>
           </div>
-          <span>المصروفات (المنصرف)</span>
+          <span class="bar-label">{icon('fa-arrow-up')} المصروفات</span>
         </div>
 
         <div class="bar-group">
           <div class="bar-container">
-            <i class="don-bar" style={`--h:${donHeight}%; height:${donHeight}%; background:linear-gradient(180deg, var(--gold-600), #b8860b)`} title={`التبرعات أونلاين: ${(stats.total_donations || 0).toLocaleString('ar-EG')} ج.م`}></i>
+            <span class="bar-val-badge" style="color:#f59e0b">{(stats.total_donations || 0).toLocaleString('ar-EG')} ج.م</span>
+            <i class="don-bar" style={`--h:${donH}%; height:${donH}%`} title={`التبرعات أونلاين: ${(stats.total_donations || 0).toLocaleString('ar-EG')} ج.م`}></i>
           </div>
-          <span>التبرعات أونلاين</span>
+          <span class="bar-label">{icon('fa-hand-holding-heart')} التبرعات</span>
+        </div>
+
+        <div class="bar-group">
+          <div class="bar-container">
+            <span class="bar-val-badge" style="color:#3b82f6">{stats.total_donors || 0} عضو</span>
+            <i class="usr-bar" style={`--h:${usrH}%; height:${usrH}%`} title={`المتبرعون والمسجلون: ${stats.total_donors || 0}`}></i>
+          </div>
+          <span class="bar-label">{icon('fa-users')} الأعضاء</span>
+        </div>
+
+        <div class="bar-group">
+          <div class="bar-container">
+            <span class="bar-val-badge" style="color:#8b5cf6">{stats.total_volunteers || 0} طلب</span>
+            <i class="vol-bar" style={`--h:${volH}%; height:${volH}%`} title={`طلبات التطوع: ${stats.total_volunteers || 0}`}></i>
+          </div>
+          <span class="bar-label">{icon('fa-people-group')} المتطوعون</span>
+        </div>
+
+        <div class="bar-group">
+          <div class="bar-container">
+            <span class="bar-val-badge" style="color:#06b6d4">{stats.total_campaigns || 0} حملة</span>
+            <i class="cmp-bar" style={`--h:${cmpH}%; height:${cmpH}%`} title={`الحملات النشطة: ${stats.total_campaigns || 0}`}></i>
+          </div>
+          <span class="bar-label">{icon('fa-bullseye')} الحملات</span>
         </div>
       </div>
     </section>
