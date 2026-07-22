@@ -1459,8 +1459,7 @@ export function DashCases({ groups = [], stats = {}, user }: { groups: any[], st
           });
         }
 
-        // زر الاستخراج العشوائي — يستخدم window.location.href مباشرةً
-        // لتفادي مشكلة الـ interceptor الذي يحاول إضافة body لـ GET request
+        // زر الاستخراج العشوائي — ينشئ رابط تحميل مباشر لتفادي أي اعتراض
         var extractBtn = document.getElementById('extract-sample-btn');
         if (extractBtn) {
           extractBtn.addEventListener('click', function() {
@@ -1471,7 +1470,12 @@ export function DashCases({ groups = [], stats = {}, user }: { groups: any[], st
               return;
             }
             var url = '/api/export/cases_sample?group_id=' + encodeURIComponent(gid) + '&count=' + encodeURIComponent(count);
-            window.location.href = url;
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = '';
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(function() { document.body.removeChild(a); }, 100);
           });
         }
       })();

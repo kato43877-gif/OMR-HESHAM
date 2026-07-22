@@ -331,6 +331,11 @@
     // 2. Forms handling
     $$('.page-dashboard form[action^="/api/"]').forEach(form => {
       if (form.dataset.bound === 'true') return
+      const method = (form.getAttribute('method') || 'POST').toUpperCase()
+      const action = form.getAttribute('action') || ''
+      // Skip GET forms, export endpoints, and forms marked with data-no-ajax
+      if (method === 'GET' || action.includes('/api/export/') || form.dataset.noAjax === 'true') return
+
       form.dataset.bound = 'true'
       form.addEventListener('submit', async event => {
         event.preventDefault()
@@ -339,7 +344,11 @@
         const submit = $('button[type="submit"]', form), original = submit?.innerHTML
         if (submit) { submit.disabled = true; submit.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> جارٍ التنفيذ' }
         try {
-          const response = await fetch(form.action,{ method:(form.method || 'POST').toUpperCase(), body:new FormData(form) })
+          const fetchOptions = { method }
+          if (method !== 'GET' && method !== 'HEAD') {
+            fetchOptions.body = new FormData(form)
+          }
+          const response = await fetch(form.action, fetchOptions)
           if (!response.ok) throw new Error('تعذر تنفيذ الطلب')
           toast('تم حفظ التغييرات بنجاح', 'success')
           setTimeout(() => {

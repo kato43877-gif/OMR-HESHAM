@@ -278,11 +278,12 @@ exportApi.get('/cases_sample', async (c) => {
 </body>
 </html>`
 
-    const safeTitle = String(groupData.title || 'cases').replace(/[^a-zA-Z0-9\u0600-\u06FF]/g, '_').slice(0, 30)
+    const encodedTitle = encodeURIComponent(String(groupData.title || 'cases').slice(0, 50))
+    const timestamp = Date.now()
 
     return c.body('\uFEFF' + excelHtml, 200, {
       'Content-Type': 'application/vnd.ms-excel; charset=utf-8',
-      'Content-Disposition': `attachment; filename="sample_${safeTitle}_${sampleCount}_${Date.now()}.xls"`
+      'Content-Disposition': `attachment; filename="sample_${sampleCount}_${timestamp}.xls"; filename*=UTF-8''sample_${encodedTitle}_${sampleCount}_${timestamp}.xls`
     })
   } catch (e: any) {
     console.error('[Cases Sample Export Error]', e)
@@ -382,11 +383,12 @@ exportApi.get('/cases_full/:id', async (c) => {
 </body>
 </html>`
 
-    const safeTitle = String(groupData.title || 'cases').replace(/[^a-zA-Z0-9\u0600-\u06FF]/g, '_').slice(0, 30)
+    const encodedTitle = encodeURIComponent(String(groupData.title || 'cases').slice(0, 50))
+    const timestamp = Date.now()
 
     return c.body('\uFEFF' + excelHtml, 200, {
       'Content-Type': 'application/vnd.ms-excel; charset=utf-8',
-      'Content-Disposition': `attachment; filename="full_${safeTitle}_${Date.now()}.xls"`
+      'Content-Disposition': `attachment; filename="full_${timestamp}.xls"; filename*=UTF-8''full_${encodedTitle}_${timestamp}.xls`
     })
   } catch (e: any) {
     console.error('[Cases Full Export Error]', e)
