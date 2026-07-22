@@ -115,7 +115,12 @@ export function DashOverview({ stats, recentDonations = [] }: { stats: any, rece
 export function DashCampaigns({ list = [] }: { list: any[] }) {
   return <>
     <section class="dash-table">
-      <header><h3>الحملات الحالية</h3></header>
+      <header style="display:flex; justify-content:space-between; align-items:center">
+        <h3>الحملات الحالية</h3>
+        <a href="/api/export/campaigns" download style="background:var(--emerald-600); color:#fff; padding:6px 12px; border-radius:8px; text-decoration:none; font-size:.85rem; font-weight:600; display:inline-flex; align-items:center; gap:6px">
+          {icon('fa-file-excel')} تصدير Excel
+        </a>
+      </header>
       <table>
         <thead>
           <tr>
@@ -411,7 +416,12 @@ export function DashContacts({ list = [] }: { list: any[] }) {
 export function DashNews({ list = [] }: { list: any[] }) {
   return <>
     <section class="dash-table">
-      <header><h3>الأخبار المنشورة</h3></header>
+      <header style="display:flex; justify-content:space-between; align-items:center">
+        <h3>الأخبار المنشورة</h3>
+        <a href="/api/export/news" download style="background:var(--emerald-600); color:#fff; padding:6px 12px; border-radius:8px; text-decoration:none; font-size:.85rem; font-weight:600; display:inline-flex; align-items:center; gap:6px">
+          {icon('fa-file-excel')} تصدير Excel
+        </a>
+      </header>
       <table>
         <thead>
           <tr>
@@ -508,7 +518,12 @@ export function DashNews({ list = [] }: { list: any[] }) {
 export function DashEvents({ list = [] }: { list: any[] }) {
   return <>
     <section class="dash-table">
-      <header><h3>الفعاليات الحالية</h3></header>
+      <header style="display:flex; justify-content:space-between; align-items:center">
+        <h3>الفعاليات الحالية</h3>
+        <a href="/api/export/events" download style="background:var(--emerald-600); color:#fff; padding:6px 12px; border-radius:8px; text-decoration:none; font-size:.85rem; font-weight:600; display:inline-flex; align-items:center; gap:6px">
+          {icon('fa-file-excel')} تصدير Excel
+        </a>
+      </header>
       <table>
         <thead>
           <tr>
@@ -611,7 +626,12 @@ export function DashEvents({ list = [] }: { list: any[] }) {
 export function DashStories({ list = [] }: { list: any[] }) {
   return <>
     <section class="dash-table">
-      <header><h3>قصص النجاح المنشورة</h3></header>
+      <header style="display:flex; justify-content:space-between; align-items:center">
+        <h3>قصص النجاح المنشورة</h3>
+        <a href="/api/export/stories" download style="background:var(--emerald-600); color:#fff; padding:6px 12px; border-radius:8px; text-decoration:none; font-size:.85rem; font-weight:600; display:inline-flex; align-items:center; gap:6px">
+          {icon('fa-file-excel')} تصدير Excel
+        </a>
+      </header>
       <table>
         <thead>
           <tr>
@@ -688,7 +708,12 @@ export function DashStories({ list = [] }: { list: any[] }) {
 export function DashJobs({ list = [] }: { list: any[] }) {
   return <>
     <section class="dash-table">
-      <header><h3>فرص العمل الحالية</h3></header>
+      <header style="display:flex; justify-content:space-between; align-items:center">
+        <h3>فرص العمل الحالية</h3>
+        <a href="/api/export/jobs" download style="background:var(--emerald-600); color:#fff; padding:6px 12px; border-radius:8px; text-decoration:none; font-size:.85rem; font-weight:600; display:inline-flex; align-items:center; gap:6px">
+          {icon('fa-file-excel')} تصدير Excel
+        </a>
+      </header>
       <table>
         <thead>
           <tr>
@@ -845,7 +870,12 @@ export function DashNewsletter({ list = [] }: { list: any[] }) {
 
 export function DashUsers({ list = [], currentUserId }: { list: any[], currentUserId: string }) {
   return <section class="dash-table">
-    <header><h3>المستخدمون والأدوار</h3></header>
+    <header style="display:flex; justify-content:space-between; align-items:center">
+      <h3>المستخدمون والأدوار</h3>
+      <a href="/api/export/users" download style="background:var(--emerald-600); color:#fff; padding:6px 12px; border-radius:8px; text-decoration:none; font-size:.85rem; font-weight:600; display:inline-flex; align-items:center; gap:6px">
+        {icon('fa-file-excel')} تصدير Excel
+      </a>
+    </header>
     <table>
       <thead>
         <tr>
