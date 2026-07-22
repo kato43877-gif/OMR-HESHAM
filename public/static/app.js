@@ -691,6 +691,162 @@
     }
   }))
 
+  /* ─── Interactive Payment Details Modal System ─── */
+  function openPaymentDetailsModal(method) {
+    let backdrop = document.getElementById('pay-modal-backdrop')
+    if (!backdrop) {
+      backdrop = document.createElement('div')
+      backdrop.id = 'pay-modal-backdrop'
+      backdrop.className = 'dash-modal-backdrop'
+      document.body.appendChild(backdrop)
+    }
+
+    const payDataMap = {
+      instapay: {
+        title: 'بيانات التحويل عبر إنستاباي — InstaPay',
+        badge: 'تحويل فوري 24/7 بدون أي رسوم',
+        logo: '/static/img/instapay-logo.png',
+        number: '01060920249',
+        label: 'رقم حساب InstaPay / المحفظة',
+        steps: [
+          'افتح تطبيق إنستاباي (InstaPay) على هاتفك',
+          'اختر "إرسال أموال" ثم اختر "رقم الهاتف / المحفظة"',
+          'أدخل الرقم التالي: <b>01060920249</b>',
+          'أدخل مبلغ التبرع واضغط "إرسال"'
+        ],
+        appUrl: 'instapay://'
+      },
+      vodafone: {
+        title: 'بيانات التحويل عبر فودافون كاش — Vodafone Cash',
+        badge: 'محفظة إلكترونية فورية',
+        logo: '/static/img/vodafone-cash-logo.png',
+        number: '01060920249',
+        label: 'رقم محفظة فودافون كاش',
+        steps: [
+          'افتح تطبيق Ana Vodafone أو اطلب كود <b>*9#</b>',
+          'اختر "تحويل أموال"',
+          'أدخل الرقم التالي: <b>01060920249</b>',
+          'أدخل مبلغ التبرع ورقمك السرّي للتأكيد'
+        ],
+        appUrl: 'tel:*9%23'
+      },
+      bank: {
+        title: 'بيانات الحساب البنكي — البنك الزراعي المصري',
+        badge: 'حساب رسمي مرخص للمؤسسة',
+        logoIcon: 'fa-building-columns',
+        number: '10010397596901014',
+        label: 'رقم الحساب البنكي الرسمي',
+        bankName: 'البنك الزراعي المصري — فرع كفر العنانية / الدقهلية',
+        accountTitle: 'مؤسسة الدكتور عمر هشام صبري الخيرية',
+        steps: [
+          'قم بزيارة أي فرع للبنك الزراعي المصري أو عبر تطبيق البنك',
+          'أدخل اسم الحساب: <b>مؤسسة الدكتور عمر هشام صبري الخيرية</b>',
+          'أدخل رقم الحساب: <b>10010397596901014</b>',
+          'قم بإيداع أو تحويل المبلغ'
+        ]
+      }
+    }
+
+    const data = payDataMap[method] || payDataMap.instapay
+
+    const logoHtml = data.logo
+      ? `<img src="${data.logo}" alt="${data.title}" style="height:36px; object-fit:contain" />`
+      : `<i class="fa-solid ${data.logoIcon || 'fa-building-columns'}" style="font-size:1.8rem; color:var(--emerald)"></i>`
+
+    const stepsHtml = data.steps.map((st, i) => `
+      <div style="display:flex; align-items:flex-start; gap:12px">
+        <span style="width:26px; height:26px; border-radius:50%; background:rgba(22,138,112,0.12); color:var(--emerald); display:grid; place-items:center; font-weight:800; font-size:0.8rem; flex-shrink:0">${i + 1}</span>
+        <p style="margin:0; font-size:0.92rem; color:var(--text); line-height:1.5">${st}</p>
+      </div>
+    `).join('')
+
+    const appBtnHtml = data.appUrl
+      ? `<a href="${data.appUrl}" class="primary-btn" style="height:44px; padding:0 20px; font-size:0.88rem"><i class="fa-solid fa-arrow-up-right-from-square"></i> فتح التطبيق مباشرة</a>`
+      : ''
+
+    backdrop.innerHTML = `
+      <div class="dash-modal" role="dialog" aria-modal="true" style="max-width:540px">
+        <div class="dash-modal-header">
+          <div style="display:flex; align-items:center; gap:12px">
+            ${logoHtml}
+            <div>
+              <h3 style="margin:0; font-size:1.1rem; font-weight:800">${data.title}</h3>
+              <span style="font-size:0.75rem; color:var(--emerald); font-weight:700">${data.badge}</span>
+            </div>
+          </div>
+          <button type="button" class="dash-modal-close" id="pay-modal-close-btn">&times;</button>
+        </div>
+        <div class="dash-modal-body">
+          ${data.accountTitle ? `<div style="background:var(--ivory); padding:10px 14px; border-radius:10px; border:1px solid var(--border); font-size:0.85rem"><b>اسم الحساب:</b> ${data.accountTitle}<br/><small style="color:var(--muted)">${data.bankName}</small></div>` : ''}
+          
+          <div class="pay-modal-number-box">
+            <span style="font-size:0.8rem; color:var(--muted); font-weight:700">${data.label}</span>
+            <strong dir="ltr" class="pay-modal-num">${data.number}</strong>
+            <button type="button" class="primary-btn modal-copy-btn" id="modal-copy-number-btn"><i class="fa-solid fa-copy"></i> نسخ الرقم</button>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:10px; margin-top:8px">
+            <b style="font-size:0.9rem; color:var(--text)">خطوات التحويل السريعة:</b>
+            ${stepsHtml}
+          </div>
+        </div>
+        <div class="dash-modal-footer">
+          <button type="button" class="dash-modal-cancel-btn" id="pay-modal-cancel-btn">إغلاق</button>
+          ${appBtnHtml}
+        </div>
+      </div>
+    `
+
+    backdrop.classList.add('open')
+
+    const closeModal = () => {
+      backdrop.classList.remove('open')
+      setTimeout(() => { backdrop.innerHTML = '' }, 300)
+    }
+
+    document.getElementById('pay-modal-close-btn')?.addEventListener('click', closeModal)
+    document.getElementById('pay-modal-cancel-btn')?.addEventListener('click', closeModal)
+    backdrop.addEventListener('click', e => { if (e.target === backdrop) closeModal() })
+
+    document.getElementById('modal-copy-number-btn')?.addEventListener('click', function() {
+      navigator.clipboard.writeText(data.number).then(() => {
+        toast('تم نسخ الرقم بنجاح: ' + data.number, 'success')
+        this.innerHTML = '<i class="fa-solid fa-check"></i> تم النسخ!'
+        setTimeout(() => { this.innerHTML = '<i class="fa-solid fa-copy"></i> نسخ الرقم' }, 2500)
+      }).catch(() => {
+        toast('تعذر النسخ التلقائي، يمكنك نسخ الرقم يدوياً: ' + data.number, 'info')
+      })
+    })
+  }
+
+  // Donate Amount Picks Preset Handler
+  document.addEventListener('click', e => {
+    const pickBtn = e.target.closest('#amount-picks-container button, .amount-picks button')
+    if (pickBtn) {
+      const amountInput = document.getElementById('amount-input')
+      if (amountInput && pickBtn.dataset.amount) {
+        amountInput.value = pickBtn.dataset.amount
+        amountInput.dispatchEvent(new Event('input', { bubbles: true }))
+        pickBtn.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('active'))
+        pickBtn.classList.add('active')
+      }
+    }
+
+    const payModalBtn = e.target.closest('[data-pay-modal]')
+    if (payModalBtn) {
+      e.preventDefault()
+      e.stopPropagation()
+      openPaymentDetailsModal(payModalBtn.dataset.payModal)
+    }
+  })
+
+  // Open modal automatically when user selects InstaPay, Vodafone or Bank radio if explicitly clicked
+  document.addEventListener('change', e => {
+    if (e.target.name === 'method' && ['instapay', 'vodafone', 'bank'].includes(e.target.value)) {
+      openPaymentDetailsModal(e.target.value)
+    }
+  })
+
   $$('[data-filter-group] button').forEach(button => button.addEventListener('click', () => {
     const value = button.dataset.filter
     $$('[data-filter-group] button').forEach(item => item.classList.remove('active'))
