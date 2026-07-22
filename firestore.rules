@@ -64,5 +64,13 @@ service cloud.firestore {
       allow create, update: if true; // Anyone can subscribe
       allow read, delete: if isAdmin();
     }
+
+    // Treasury — Income & Expenses (Admin only)
+    match /treasury_income/{document} {
+      allow read, write: if isAdmin();
+    }
+    match /treasury_expenses/{document} {
+      allow read, write: if isAdmin();
+    }
   }
 }

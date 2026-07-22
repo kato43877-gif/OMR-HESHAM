@@ -245,14 +245,18 @@ app.get('/dashboard', async (c) => {
     const db = getFirestore(c)
 
     if (view === 'overview') {
-      const [cSnap, dSnap, vSnap, recentDonationsSnap] = await Promise.all([
+      const [cSnap, dSnap, vSnap, recentDonationsSnap, incSnap, expSnap] = await Promise.all([
         db.collection('campaigns').where('is_published', '==', true).get(),
         db.collection('donations').where('status', '==', 'completed').get(),
         db.collection('volunteers').get(),
-        db.collection('donations').orderBy('created_at', 'desc').limit(5).get()
+        db.collection('donations').orderBy('created_at', 'desc').limit(5).get(),
+        db.collection('treasury_income').get(),
+        db.collection('treasury_expenses').get()
       ])
 
       const totalDonations = dSnap.docs.reduce((sum: number, doc: any) => sum + Number(doc.data().amount || 0), 0)
+      const totalIncome = incSnap.docs.reduce((sum: number, doc: any) => sum + Number(doc.data().amount || 0), 0)
+      const totalExpenses = expSnap.docs.reduce((sum: number, doc: any) => sum + Number(doc.data().amount || 0), 0)
       const uniqueDonors = new Set(dSnap.docs.map((doc: any) => doc.data().donor_email || doc.data().donor_phone)).size
 
       viewData = {
@@ -260,9 +264,56 @@ app.get('/dashboard', async (c) => {
           total_donations: totalDonations,
           total_campaigns: cSnap.size,
           total_donors: uniqueDonors,
-          total_volunteers: vSnap.size
+          total_volunteers: vSnap.size,
+          total_income: totalIncome,
+          total_expenses: totalExpenses,
+          balance: totalIncome - totalExpenses
         },
         recentDonations: recentDonationsSnap.docs.map((doc: any) => ({ id: doc.id, ...doc.data() }))
+      }
+    } else if (view === 'treasury') {
+      const [incSnap, expSnap, campSnap] = await Promise.all([
+        db.collection('treasury_income').orderBy('created_at', 'desc').get(),
+        db.collection('treasury_expenses').orderBy('created_at', 'desc').get(),
+        db.collection('campaigns').get()
+      ])
+
+      const incomeList = incSnap.docs.map((doc: any) => ({ id: doc.id, ...doc.data() }))
+      const expenseList = expSnap.docs.map((doc: any) => ({ id: doc.id, ...doc.data() }))
+      const campaigns = campSnap.docs.map((doc: any) => ({ id: doc.id, ...doc.data() }))
+
+      const totalIncome = incomeList.reduce((sum: number, r: any) => sum + Number(r.amount || 0), 0)
+      const totalExpenses = expenseList.reduce((sum: number, r: any) => sum + Number(r.amount || 0), 0)
+
+      viewData = {
+        summary: {
+          balance: totalIncome - totalExpenses,
+          total_income: totalIncome,
+          total_expenses: totalExpenses,
+          income_count: incomeList.length,
+          expense_count: expenseList.length
+        },
+        incomeList: incomeList.slice(0, 10),
+        expenseList: expenseList.slice(0, 10),
+        campaigns
+      }
+    } else if (view === 'income') {
+      const [snap, campSnap] = await Promise.all([
+        db.collection('treasury_income').orderBy('created_at', 'desc').get(),
+        db.collection('campaigns').get()
+      ])
+      viewData = {
+        list: snap.docs.map((doc: any) => ({ id: doc.id, ...doc.data() })),
+        campaigns: campSnap.docs.map((doc: any) => ({ id: doc.id, ...doc.data() }))
+      }
+    } else if (view === 'expenses') {
+      const [snap, campSnap] = await Promise.all([
+        db.collection('treasury_expenses').orderBy('created_at', 'desc').get(),
+        db.collection('campaigns').get()
+      ])
+      viewData = {
+        list: snap.docs.map((doc: any) => ({ id: doc.id, ...doc.data() })),
+        campaigns: campSnap.docs.map((doc: any) => ({ id: doc.id, ...doc.data() }))
       }
     } else if (view === 'campaigns') {
       const snap = await db.collection('campaigns').orderBy('created_at', 'desc').get()

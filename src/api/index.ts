@@ -14,6 +14,7 @@ import { profile } from './profile'
 import { users } from './users'
 import { upload } from './upload'
 import { exportApi } from './export'
+import { treasury } from './treasury'
 
 const api = new Hono()
 
@@ -57,5 +58,6 @@ api.route('/profile', profile)
 api.route('/users', users)
 api.route('/upload', upload)
 api.route('/export', exportApi)
+api.route('/treasury', treasury)
 
 export { api }

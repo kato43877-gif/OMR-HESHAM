@@ -31,6 +31,33 @@ const collectionConfigs: Record<string, ConfigDef> = {
       { key: 'created_at', label: 'تاريخ التحويل', format: (v) => v ? new Date(v).toLocaleString('ar-EG') : '-' }
     ]
   },
+  treasury_income: {
+    title: 'سجل إيرادات الخزنة المالية',
+    columns: [
+      { key: 'amount', label: 'المبلغ (ج.م)', format: (v) => Number(v || 0).toLocaleString('ar-EG') + ' ج.م' },
+      { key: 'source', label: 'مصدر الإيراد' },
+      { key: 'donor_name', label: 'اسم المتبرع/المصدر', format: (v) => v || 'فاعل خير' },
+      { key: 'donor_phone', label: 'رقم الهاتف', format: (v) => v || '-' },
+      { key: 'campaign_title', label: 'الحملة المستهدفة', format: (v) => v || 'الصندوق العام' },
+      { key: 'description', label: 'التفاصيل والملاحظات', format: (v) => v || '-' },
+      { key: 'date', label: 'تاريخ الاستلام' },
+      { key: 'recorded_by', label: 'تم التسجيل بواسطة (الأدمن)' },
+      { key: 'created_at', label: 'تاريخ الإدخال النظامي', format: (v) => v ? new Date(v).toLocaleString('ar-EG') : '-' }
+    ]
+  },
+  treasury_expenses: {
+    title: 'سجل مصروفات الخزنة المالية',
+    columns: [
+      { key: 'amount', label: 'المبلغ المصروف (ج.م)', format: (v) => Number(v || 0).toLocaleString('ar-EG') + ' ج.م' },
+      { key: 'category', label: 'بند الصرف' },
+      { key: 'beneficiary', label: 'الجهة / المستفيد' },
+      { key: 'campaign_title', label: 'الحملة المرتبطة', format: (v) => v || 'عام' },
+      { key: 'description', label: 'وصف المصروف' },
+      { key: 'date', label: 'تاريخ الصرف' },
+      { key: 'recorded_by', label: 'تم الصرف بواسطة (الأدمن)' },
+      { key: 'created_at', label: 'تاريخ الإدخال النظامي', format: (v) => v ? new Date(v).toLocaleString('ar-EG') : '-' }
+    ]
+  },
   volunteers: {
     title: 'سجل طلبات التطوع والمبادرات',
     columns: [

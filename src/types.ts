@@ -142,3 +142,34 @@ export interface UserProfile {
   avatar_url?: string
   created_at?: string
 }
+
+export interface TreasuryIncome {
+  id?: string
+  amount: number
+  source: string
+  donor_name?: string
+  donor_phone?: string
+  campaign_id?: string | null
+  campaign_title?: string | null
+  description?: string
+  receipt_url?: string
+  date: string
+  recorded_by: string
+  recorded_by_id: string
+  created_at?: string
+}
+
+export interface TreasuryExpense {
+  id?: string
+  amount: number
+  category: string
+  beneficiary: string
+  campaign_id?: string | null
+  campaign_title?: string | null
+  description: string
+  receipt_url?: string
+  date: string
+  recorded_by: string
+  recorded_by_id: string
+  created_at?: string
+}

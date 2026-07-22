@@ -4,6 +4,9 @@ import type { UserSession } from '../types'
 export function Dashboard({ view, data, user }: { view: string, data: any, user: UserSession }) {
   const sideMenu = [
     ['fa-chart-pie', 'نظرة عامة', 'overview'],
+    ['fa-vault', 'الخزنة المالية', 'treasury'],
+    ['fa-arrow-down', 'الإيرادات (الوارد)', 'income'],
+    ['fa-arrow-up', 'المصروفات (المنصرف)', 'expenses'],
     ['fa-bullseye', 'الحملات', 'campaigns'],
     ['fa-hand-holding-dollar', 'التبرعات', 'donations'],
     ['fa-people-group', 'المتطوعون', 'volunteers'],
@@ -43,6 +46,9 @@ export function Dashboard({ view, data, user }: { view: string, data: any, user:
         </header>
 
         {view === 'overview' && <DashOverview stats={data.stats} recentDonations={data.recentDonations} />}
+        {view === 'treasury' && <DashTreasury summary={data.summary} incomeList={data.incomeList} expenseList={data.expenseList} campaigns={data.campaigns} user={user} />}
+        {view === 'income' && <DashIncome list={data.list} campaigns={data.campaigns} user={user} />}
+        {view === 'expenses' && <DashExpenses list={data.list} campaigns={data.campaigns} user={user} />}
         {view === 'campaigns' && <DashCampaigns list={data.list} />}
         {view === 'donations' && <DashDonations list={data.list} />}
         {view === 'volunteers' && <DashVolunteers list={data.list} />}
@@ -62,17 +68,28 @@ export function Dashboard({ view, data, user }: { view: string, data: any, user:
 
 export function DashOverview({ stats, recentDonations = [] }: { stats: any, recentDonations?: any[] }) {
   const items = [
-    ['إجمالي التبرعات', `${(stats.total_donations || 0).toLocaleString('ar-EG')} ج.م`, 'fa-hand-holding-heart'],
-    ['الحملات النشطة', `${stats.total_campaigns || 0}`, 'fa-bullseye'],
-    ['المتبرعون', `${stats.total_donors || 0}`, 'fa-users'],
-    ['طلبات التطوع', `${stats.total_volunteers || 0}`, 'fa-people-group']
+    ['رصيد الخزنة الصافي', `${(stats.balance || 0).toLocaleString('ar-EG')} ج.م`, 'fa-vault', stats.balance >= 0 ? 'var(--emerald-600)' : '#e53935'],
+    ['إجمالي الإيرادات (الوارد)', `${(stats.total_income || 0).toLocaleString('ar-EG')} ج.م`, 'fa-arrow-down-left-and-arrow-up-right-to-center', 'var(--emerald-600)'],
+    ['إجمالي المصروفات (المنصرف)', `${(stats.total_expenses || 0).toLocaleString('ar-EG')} ج.م`, 'fa-money-bill-transfer', '#e86f51'],
+    ['التبرعات أونلاين', `${(stats.total_donations || 0).toLocaleString('ar-EG')} ج.م`, 'fa-hand-holding-heart', 'var(--gold-600)'],
+    ['الحملات النشطة', `${stats.total_campaigns || 0}`, 'fa-bullseye', 'var(--blue-600)'],
+    ['المتبرعون المسجلون', `${stats.total_donors || 0}`, 'fa-users', 'var(--emerald-600)'],
+    ['طلبات التطوع', `${stats.total_volunteers || 0}`, 'fa-people-group', 'var(--gold-600)']
   ]
   return <>
-    <div class="kpi-grid">
-      {items.map(k => <article><div>{icon(k[2])}</div><p>{k[0]}</p><b>{k[1]}</b></article>)}
+    <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem">
+      {items.map(k => (
+        <article style="background: var(--paper); border: 1px solid var(--line); border-radius: 18px; padding: 1.2rem; display: flex; flex-direction: column; justify-content: space-between">
+          <div style="display: flex; align-items: center; justify-content: space-between">
+            <span style={`font-size: 1.4rem; color: ${k[3]}`}>{icon(k[2])}</span>
+            <small style="color: var(--muted); font-size: .75rem">{k[0]}</small>
+          </div>
+          <b style={`font-size: 1.5rem; margin-top: .8rem; color: ${k[3]}`}>{k[1]}</b>
+        </article>
+      ))}
     </div>
     <section class="dash-table" style="margin-top:2rem">
-      <header><h3>أحدث التبرعات</h3></header>
+      <header><h3>أحدث عمليات التبرع الواردة للموقع</h3></header>
       <table>
         <thead>
           <tr>
@@ -98,6 +115,276 @@ export function DashOverview({ stats, recentDonations = [] }: { stats: any, rece
           })}
         </tbody>
       </table>
+    </section>
+  </>
+}
+
+export function DashTreasury({ summary = {}, incomeList = [], expenseList = [], campaigns = [], user }: { summary: any, incomeList: any[], expenseList: any[], campaigns: any[], user: UserSession }) {
+  const balance = summary.balance || 0
+  const totalIncome = summary.total_income || 0
+  const totalExpenses = summary.total_expenses || 0
+
+  return <>
+    <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.2rem">
+      <article style="background: var(--paper); border: 2px solid var(--emerald-600); border-radius: 20px; padding: 1.4rem">
+        <div style="display:flex; justify-content:space-between; align-items:center">
+          <span>{icon('fa-vault')}</span>
+          <small style="color:var(--muted)">صافي رصيد الخزنة الحالي</small>
+        </div>
+        <b style={`font-size:2rem; display:block; margin-top:.8rem; color:${balance >= 0 ? 'var(--emerald-600)' : '#e53935'}`}>
+          {balance.toLocaleString('ar-EG')} ج.م
+        </b>
+      </article>
+      <article style="background: var(--paper); border: 1px solid var(--line); border-radius: 20px; padding: 1.4rem">
+        <div style="display:flex; justify-content:space-between; align-items:center">
+          <span style="color:var(--emerald-600)">{icon('fa-arrow-down')}</span>
+          <small style="color:var(--muted)">إجمالي الوارد (الإيرادات)</small>
+        </div>
+        <b style="font-size:1.8rem; display:block; margin-top:.8rem; color:var(--emerald-600)">
+          {totalIncome.toLocaleString('ar-EG')} ج.م
+        </b>
+      </article>
+      <article style="background: var(--paper); border: 1px solid var(--line); border-radius: 20px; padding: 1.4rem">
+        <div style="display:flex; justify-content:space-between; align-items:center">
+          <span style="color:#e86f51">{icon('fa-arrow-up')}</span>
+          <small style="color:var(--muted)">إجمالي المنصرف (المصروفات)</small>
+        </div>
+        <b style="font-size:1.8rem; display:block; margin-top:.8rem; color:#e86f51">
+          {totalExpenses.toLocaleString('ar-EG')} ج.م
+        </b>
+      </article>
+    </div>
+
+    <div style="display:flex; gap:1rem; margin:1.5rem 0">
+      <a href="/dashboard?view=income" class="primary-btn" style="background:var(--emerald-600); text-decoration:none">
+        {icon('fa-plus')} إضافة إيراد جديد
+      </a>
+      <a href="/dashboard?view=expenses" class="primary-btn" style="background:#e86f51; text-decoration:none">
+        {icon('fa-minus')} إضافة مصروف جديد
+      </a>
+    </div>
+
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap:1.5rem; margin-top:1rem">
+      <section class="dash-table">
+        <header style="display:flex; justify-content:space-between; align-items:center">
+          <h3 style="color:var(--emerald-600)">أحدث الإيرادات الواردة</h3>
+          <a href="/dashboard?view=income" style="font-size:.82rem; font-weight:bold">عرض الكل ←</a>
+        </header>
+        <table>
+          <thead>
+            <tr>
+              <th>المبلغ</th>
+              <th>المصدر</th>
+              <th>التاريخ</th>
+              <th>الأدمن المسجل</th>
+            </tr>
+          </thead>
+          <tbody>
+            {incomeList.map((inc: any) => (
+              <tr>
+                <td style="font-weight:bold; color:var(--emerald-600)">+{Number(inc.amount).toLocaleString('ar-EG')} ج.م</td>
+                <td>{inc.source}</td>
+                <td>{inc.date}</td>
+                <td><small style="background:rgba(22,138,112,.1); padding:3px 8px; border-radius:6px; font-weight:600">{inc.recorded_by || 'مشرف'}</small></td>
+              </tr>
+            ))}
+            {incomeList.length === 0 && <tr><td colSpan={4} style="text-align:center; color:var(--muted)">لا توجد إيرادات مسجلة بعد</td></tr>}
+          </tbody>
+        </table>
+      </section>
+
+      <section class="dash-table">
+        <header style="display:flex; justify-content:space-between; align-items:center">
+          <h3 style="color:#e86f51">أحدث المصروفات المنصرفة</h3>
+          <a href="/dashboard?view=expenses" style="font-size:.82rem; font-weight:bold">عرض الكل ←</a>
+        </header>
+        <table>
+          <thead>
+            <tr>
+              <th>المبلغ</th>
+              <th>البند والجهة</th>
+              <th>التاريخ</th>
+              <th>الأدمن المسجل</th>
+            </tr>
+          </thead>
+          <tbody>
+            {expenseList.map((exp: any) => (
+              <tr>
+                <td style="font-weight:bold; color:#e86f51">-{Number(exp.amount).toLocaleString('ar-EG')} ج.م</td>
+                <td><b>{exp.category}</b> — {exp.beneficiary}</td>
+                <td>{exp.date}</td>
+                <td><small style="background:rgba(232,111,81,.1); padding:3px 8px; border-radius:6px; font-weight:600">{exp.recorded_by || 'مشرف'}</small></td>
+              </tr>
+            ))}
+            {expenseList.length === 0 && <tr><td colSpan={4} style="text-align:center; color:var(--muted)">لا توجد مصروفات مسجلة بعد</td></tr>}
+          </tbody>
+        </table>
+      </section>
+    </div>
+  </>
+}
+
+export function DashIncome({ list = [], campaigns = [], user }: { list: any[], campaigns: any[], user: UserSession }) {
+  const today = new Date().toISOString().split('T')[0]
+
+  return <>
+    <section class="dash-table">
+      <header style="display:flex; justify-content:space-between; align-items:center">
+        <h3>سجل الإيرادات والأموال الواردة</h3>
+        <a href="/api/export/treasury_income" download class="export-excel-btn">
+          {icon('fa-file-excel')} تصدير Excel
+        </a>
+      </header>
+      <table>
+        <thead>
+          <tr>
+            <th>المبلغ</th>
+            <th>نوع المصدر</th>
+            <th>اسم المتبرع/المصدر</th>
+            <th>الهاتف</th>
+            <th>الحملة</th>
+            <th>التاريخ</th>
+            <th>مسجَّل بواسطة</th>
+            <th>ملاحظات</th>
+            <th>الإجراءات</th>
+          </tr>
+        </thead>
+        <tbody>
+          {list.map((inc: any) => (
+            <tr>
+              <td style="font-weight:bold; color:var(--emerald-600)">+{Number(inc.amount).toLocaleString('ar-EG')} ج.م</td>
+              <td><span style="background:rgba(22,138,112,.12); color:var(--emerald-600); padding:3px 8px; border-radius:6px; font-weight:600">{inc.source}</span></td>
+              <td>{inc.donor_name || 'فاعل خير'}</td>
+              <td>{inc.donor_phone || '-'}</td>
+              <td>{inc.campaign_title || 'الصندوق العام'}</td>
+              <td>{inc.date}</td>
+              <td><b>{inc.recorded_by || 'مشرف'}</b></td>
+              <td style="max-width:200px; white-space:pre-wrap">{inc.description || '-'}</td>
+              <td>
+                <form action={`/api/treasury/income/delete/${inc.id}`} method="post" class="dash-action-form" data-confirm="هل أنت متأكد من حذف هذا الإيراد؟">
+                  <button type="submit" class="dash-delete-btn">{icon('fa-trash-can')} حذف</button>
+                </form>
+              </td>
+            </tr>
+          ))}
+          {list.length === 0 && <tr><td colSpan={9} style="text-align:center; color:var(--muted)">لا توجد إيرادات مسجلة بعد</td></tr>}
+        </tbody>
+      </table>
+    </section>
+
+    <section class="section-pad" style="padding-top:2rem">
+      <form action="/api/treasury/income/add" method="post" style="background:var(--surface); border:1px solid var(--border); padding:2rem; border-radius:16px; max-width:650px; display:flex; flex-direction:column; gap:1.2rem">
+        <h3 style="color:var(--emerald-600)">تسجيل إيراد وارد جديد</h3>
+        <label>المبلغ (ج.م) *<input type="number" step="any" name="amount" required placeholder="مثال: 5000" /></label>
+        <label>مصدر الإيراد *
+          <select name="source" required style="padding:12px; border-radius:12px; border:1px solid var(--line); background:var(--ivory)">
+            <option value="تبرع نقدي مباشر">تبرع نقدي مباشر</option>
+            <option value="تحويل إنستاباي (InstaPay)">تحويل إنستاباي (InstaPay)</option>
+            <option value="تحويل فودافون كاش">تحويل فودافون كاش</option>
+            <option value="تحويل بنكي">تحويل بنكي</option>
+            <option value="زكاة">زكاة</option>
+            <option value="صدقة">صدقة</option>
+            <option value="كفالة">كفالة أيتام/أسر</option>
+            <option value="أخرى">مصدر آخر</option>
+          </select>
+        </label>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem">
+          <label>اسم المتبرع/المصدر<input name="donor_name" placeholder="اتركه فارغًا إذا كان فاعل خير" /></label>
+          <label>رقم الهاتف<input name="donor_phone" placeholder="01xxxxxxxxx" /></label>
+        </div>
+        <label>مخصص لحملة معينة؟
+          <select name="campaign_id" style="padding:12px; border-radius:12px; border:1px solid var(--line); background:var(--ivory)">
+            <option value="">الصندوق العام (بدون تخصيص)</option>
+            {campaigns.map((c: any) => <option value={c.id}>{c.title}</option>)}
+          </select>
+        </label>
+        <label>تاريخ الاستلام *<input type="date" name="date" defaultValue={today} required /></label>
+        <label>ملاحظات وتفاصيل إضافية<textarea name="description" rows={3} placeholder="أي تفاصيل تتعلق بالاستلام أو الحساب البنكي..."></textarea></label>
+        <div style="background:rgba(22,138,112,.08); padding:10px 14px; border-radius:10px; font-size:.85rem; color:var(--emerald-600)">
+          {icon('fa-user-check')} سيتم تسجيل هذا الإيراد باسم الأدمن الحالي: <b>{user.name}</b>
+        </div>
+        <button class="primary-btn" type="submit" style="background:var(--emerald-600)">تسجيل الإيراد في الخزنة</button>
+      </form>
+    </section>
+  </>
+}
+
+export function DashExpenses({ list = [], campaigns = [], user }: { list: any[], campaigns: any[], user: UserSession }) {
+  const today = new Date().toISOString().split('T')[0]
+
+  return <>
+    <section class="dash-table">
+      <header style="display:flex; justify-content:space-between; align-items:center">
+        <h3>سجل المصروفات والأموال المنصرفة</h3>
+        <a href="/api/export/treasury_expenses" download class="export-excel-btn">
+          {icon('fa-file-excel')} تصدير Excel
+        </a>
+      </header>
+      <table>
+        <thead>
+          <tr>
+            <th>المبلغ المصروف</th>
+            <th>بند الصرف</th>
+            <th>الجهة / المستفيد</th>
+            <th>الحملة المرتبطة</th>
+            <th>وصف المصروف</th>
+            <th>التاريخ</th>
+            <th>منصرف بواسطة (الأدمن)</th>
+            <th>الإجراءات</th>
+          </tr>
+        </thead>
+        <tbody>
+          {list.map((exp: any) => (
+            <tr>
+              <td style="font-weight:bold; color:#e86f51">-{Number(exp.amount).toLocaleString('ar-EG')} ج.م</td>
+              <td><span style="background:rgba(232,111,81,.12); color:#e86f51; padding:3px 8px; border-radius:6px; font-weight:600">{exp.category}</span></td>
+              <td><b>{exp.beneficiary}</b></td>
+              <td>{exp.campaign_title || 'عام'}</td>
+              <td style="max-width:220px; white-space:pre-wrap">{exp.description}</td>
+              <td>{exp.date}</td>
+              <td><b>{exp.recorded_by || 'مشرف'}</b></td>
+              <td>
+                <form action={`/api/treasury/expense/delete/${exp.id}`} method="post" class="dash-action-form" data-confirm="هل أنت متأكد من حذف هذا المصروف؟">
+                  <button type="submit" class="dash-delete-btn">{icon('fa-trash-can')} حذف</button>
+                </form>
+              </td>
+            </tr>
+          ))}
+          {list.length === 0 && <tr><td colSpan={8} style="text-align:center; color:var(--muted)">لا توجد مصروفات مسجلة بعد</td></tr>}
+        </tbody>
+      </table>
+    </section>
+
+    <section class="section-pad" style="padding-top:2rem">
+      <form action="/api/treasury/expense/add" method="post" style="background:var(--surface); border:1px solid var(--border); padding:2rem; border-radius:16px; max-width:650px; display:flex; flex-direction:column; gap:1.2rem">
+        <h3 style="color:#e86f51">تسجيل مصروف جديد</h3>
+        <label>المبلغ المصروف (ج.م) *<input type="number" step="any" name="amount" required placeholder="مثال: 1200" /></label>
+        <label>بند الصرف *
+          <select name="category" required style="padding:12px; border-radius:12px; border:1px solid var(--line); background:var(--ivory)">
+            <option value="دعم صحي وعلاج">دعم صحي وعلاج (أدوية وعمليات)</option>
+            <option value="إطعام وكراتين غذائية">إطعام وكراتين غذائية</option>
+            <option value="دعم تعليمي ومصروفات">دعم تعليمي ومصروفات دراسية</option>
+            <option value="كسوة وهدايا">كسوة وهدايا أعياد ومواسم</option>
+            <option value="مصاريف تشغيل ومقر">مصاريف تشغيل ومقر المؤسسة</option>
+            <option value="مطبوعات وإعلانات">مطبوعات وإعلانات للمبادرات</option>
+            <option value="مساعدات مالية مباشرة">مساعدات مالية مباشرة لأسر مستحقة</option>
+            <option value="أخرى">بند آخر</option>
+          </select>
+        </label>
+        <label>الجهة أو اسم المستفيد *<input name="beneficiary" required placeholder="مثال: صيدلية كفر العنانية / أسرة المرحوم..." /></label>
+        <label>مرتبط بحملة معينة؟
+          <select name="campaign_id" style="padding:12px; border-radius:12px; border:1px solid var(--line); background:var(--ivory)">
+            <option value="">عام (بدون ربط بحملة)</option>
+            {campaigns.map((c: any) => <option value={c.id}>{c.title}</option>)}
+          </select>
+        </label>
+        <label>وصف ومبرر الصرف *<textarea name="description" rows={3} required placeholder="اكتب التفاصيل والفواتير المرتبطة بهذا الصرف..."></textarea></label>
+        <label>تاريخ الصرف *<input type="date" name="date" defaultValue={today} required /></label>
+        <div style="background:rgba(232,111,81,.08); padding:10px 14px; border-radius:10px; font-size:.85rem; color:#e86f51">
+          {icon('fa-user-check')} سيتم تسجيل هذا المصروف باسم الأدمن الحالى: <b>{user.name}</b>
+        </div>
+        <button class="primary-btn" type="submit" style="background:#e86f51">تسجيل المصروف في الخزنة</button>
+      </form>
     </section>
   </>
 }
