@@ -1,20 +1,21 @@
 import crypto from 'crypto'
 
-const CLOUDINARY_CLOUD_NAME = 'dtekkty3j'
-const CLOUDINARY_API_KEY = '397594679349495'
-const CLOUDINARY_API_SECRET = '7T_Qleu5HsO2FjTQGTuBQOx8o2E'
-
 /**
  * Uploads a file (Hono's File/Blob) to Cloudinary and returns its secure URL.
+ * Credentials are read from environment variables (never hardcoded).
  */
 export async function uploadToCloudinary(file: File, c?: any): Promise<string> {
   const glob = globalThis as any
   const env = c?.env || {}
   const procEnv = typeof glob.process !== 'undefined' ? glob.process.env : {}
 
-  const cloudName = env.CLOUDINARY_CLOUD_NAME || procEnv.CLOUDINARY_CLOUD_NAME || CLOUDINARY_CLOUD_NAME
-  const apiKey = env.CLOUDINARY_API_KEY || procEnv.CLOUDINARY_API_KEY || CLOUDINARY_API_KEY
-  const apiSecret = env.CLOUDINARY_API_SECRET || procEnv.CLOUDINARY_API_SECRET || CLOUDINARY_API_SECRET
+  const cloudName = env.CLOUDINARY_CLOUD_NAME || procEnv.CLOUDINARY_CLOUD_NAME || ''
+  const apiKey = env.CLOUDINARY_API_KEY || procEnv.CLOUDINARY_API_KEY || ''
+  const apiSecret = env.CLOUDINARY_API_SECRET || procEnv.CLOUDINARY_API_SECRET || ''
+
+  if (!cloudName || !apiKey || !apiSecret) {
+    throw new Error('Cloudinary credentials missing. Set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET in .env')
+  }
 
   const timestamp = Math.round(Date.now() / 1000)
 

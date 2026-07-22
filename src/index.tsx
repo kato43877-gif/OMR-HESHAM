@@ -48,7 +48,9 @@ app.use('*', async (c, next) => {
         role: profileData?.role || 'user',
         phone: profileData?.phone || ''
       })
-    } catch (e) { }
+    } catch (e: any) {
+      console.error('[Session Check]', e.message || 'Invalid session cookie')
+    }
   }
   await next()
 })
@@ -168,7 +170,7 @@ function Footer() {
   </footer>
 }
 
-function Layout({ children, title = 'مؤسسة الدكتور عمر هشام الخيرية', description = 'عطاء مستمر لتنمية الإنسان والمجتمع', user, showFooter = false, pageType = 'public' }: { children: any, title?: string, description?: string, user?: any, showFooter?: boolean, pageType?: 'public' | 'auth' | 'dashboard' }) {
+function Layout({ children, title = 'مؤسسة الدكتور عمر هشام الخيرية', description = 'عطاء مستمر لتنمية الإنسان والمجتمع', user, showFooter = true, pageType = 'public' }: { children: any, title?: string, description?: string, user?: any, showFooter?: boolean, pageType?: 'public' | 'auth' | 'dashboard' }) {
   return <html lang="ar" dir="rtl"><head>
     <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} /><meta name="theme-color" content="#f9f6ee" /><meta name="color-scheme" content="light dark" />
@@ -183,7 +185,7 @@ function Layout({ children, title = 'مؤسسة الدكتور عمر هشام �
   </head><body class={`page-${pageType}`}>
       {pageType !== 'dashboard' && <div class="preloader" id="preloader"><div class="preloader-orbit"><img src="/static/foundation-logo.png" alt="" /><span></span></div><p>يبدأ الأثر من قلبٍ يؤمن بالخير</p></div>}
       <div class="noise"></div><div class="cursor-dot" id="cursor-dot"></div><div class="cursor-ring" id="cursor-ring"></div>
-      {pageType !== 'dashboard' && <Header user={user} />}<main>{children}</main>{showFooter && <Footer />}
+      {pageType !== 'dashboard' && <Header user={user} />}<main>{children}</main>{pageType !== 'dashboard' && showFooter && <Footer />}
       {pageType !== 'dashboard' && <button class="scroll-top" id="scroll-top" aria-label="إلى أعلى">{icon('fa-arrow-up')}</button>}
       <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"><span class="toast-icon"><i class="fa-solid fa-check"></i></span><span class="toast-content"><strong>تم بنجاح</strong><span class="toast-message"></span></span><button class="toast-close" type="button" aria-label="إغلاق الإشعار">{icon('fa-xmark')}</button><span class="toast-progress" aria-hidden="true"></span></div>
       <div class="confirm-modal" id="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="confirm-title" aria-hidden="true"><div class="confirm-card"><span class="confirm-icon">{icon('fa-triangle-exclamation')}</span><h2 id="confirm-title">تأكيد الإجراء</h2><p id="confirm-message">هل أنت متأكد من تنفيذ هذا الإجراء؟</p><div><button type="button" class="confirm-cancel">إلغاء</button><button type="button" class="confirm-accept">تأكيد</button></div></div></div>
@@ -201,12 +203,13 @@ function CampaignCard({ c }: { c: any }) {
   const raised = Number(c.raised || 0)
   const progress = goal > 0 ? Math.round(raised / goal * 100) : 0
   const detailUrl = c.id ? `/campaigns/${c.id}` : '#'
+  const hasImage = c.image_url && c.image_url.trim()
 
   return <article class="campaign-card reveal tilt-card">
-    <div class="campaign-visual">
+    <div class="campaign-visual" style={hasImage ? `background-image:url(${c.image_url});background-size:cover;background-position:center;` : ''}>
       <span class="visual-orb"></span>
-      {icon(c.icon || 'fa-heart')}
-      <b>{c.category || c.cat || 'عام'}</b>
+      {!hasImage && icon(c.icon || 'fa-heart')}
+      <b style={hasImage ? 'background:rgba(12,74,63,0.85);color:#fff;padding:4px 10px;border-radius:8px' : ''}>{c.category || c.cat || 'عام'}</b>
       {(c.is_urgent || c.urgent) && <em>عاجل</em>}
     </div>
     <div class="campaign-body">
@@ -349,12 +352,12 @@ function CampaignDetail({ c, user }: { c: any, user?: any }) {
         <b>{progress}%</b>
         <div class="progress-track"><i style={`width:${progress}%`}></i></div>
       </div>
-      <a class="primary-btn" href="/donate">ساهم في الحملة {icon('fa-heart')}</a>
+      <a class="primary-btn" href={`/donate?campaign=${c.id}`}>ساهم في الحملة {icon('fa-heart')}</a>
     </section>
   </Layout>
 }
 
-function Donate({ user }: { user?: any }) {
+function Donate({ user, campaigns = [], selectedCampaignId }: { user?: any, campaigns?: any[], selectedCampaignId?: string }) {
   return <Layout user={user} title="تبرّع الآن | مؤسسة الدكتور عمر هشام">
     <PageHero kicker="تبرّع الآن" title={'عطاؤك اليوم،<br/><em>قد يغيّر غدًا كاملًا.</em>'} text="اختر الطريقة الأنسب لك. كل بيانات التحويل أمامك بوضوح، وكل مساهمة موثّقة بأمانة." />
     <section class="donate-layout section-pad">
@@ -374,6 +377,7 @@ function Donate({ user }: { user?: any }) {
             <label>رقم الهاتف<input name="phone" required inputmode="tel" placeholder="01xxxxxxxxx" /></label>
           </div>
           <label>البريد الإلكتروني <span>اختياري</span><input type="email" name="email" placeholder="name@example.com" /></label>
+          {campaigns.length > 0 && <label>الحملة <span>اختياري</span><select name="campaign_id"><option value="">الصندوق العام</option>{campaigns.map((cp: any) => <option value={cp.id} selected={cp.id === selectedCampaignId}>{cp.title}</option>)}</select></label>}
           <fieldset>
             <legend>طريقة التحويل</legend>
             <label class="method-option"><input type="radio" name="method" value="instapay" checked /><span>{icon('fa-building-columns')}<b>إنستاباي / تحويل بنكي</b><small>البنك الزراعي المصري</small></span></label>
@@ -543,9 +547,28 @@ function Transparency({ user }: { user?: any }) {
 }
 
 function Gallery({ user }: { user?: any }) {
+  const galleryItems = [
+    { title: 'قافلة الدفء والإطعام', location: 'كفر العنانية', img: '/static/img/gallery-1.jpg', tag: 'غذاء' },
+    { title: 'مستلزمات مدرسية للأطفال', location: 'الدقهلية', img: '/static/img/gallery-2.jpg', tag: 'تعليم' },
+    { title: 'الرعاية الطبية والدواء', location: 'مستشفى كفر العنانية', img: '/static/img/gallery-3.jpg', tag: 'صحة' },
+    { title: 'تكريم حفظة القرآن الكريم', location: 'المؤسسة', img: '/static/img/gallery-4.jpg', tag: 'قرآن' },
+    { title: 'كسوة العيد للأسر الأولى بالرعاية', location: 'كفر العنانية', img: '/static/img/gallery-5.jpg', tag: 'مجتمع' },
+    { title: 'فرحة العطاء في الميدان', location: 'الدقهلية', img: '/static/img/gallery-6.jpg', tag: 'تطوع' },
+    { title: 'مشروع الأضاحي السنوي', location: 'كفر العنانية', img: '/static/img/gallery-7.jpg', tag: 'موسمي' },
+    { title: 'زيارات ودية وتكريم الأوائل', location: 'منازل الطلاب', img: '/static/img/gallery-8.jpg', tag: 'تعليم' }
+  ]
   return <Layout user={user} title="معرض الصور | مؤسسة الدكتور عمر هشام">
     <PageHero kicker="معرض الصور" title={'وجوهٌ ومواقف،<br/><em>تقول ما لا تقوله الأرقام.</em>'} text="لقطات من الميدان، صُنعت فيها الفرحة بأيدي المتطوعين وقلوب المتبرعين." />
-    <section class="gallery-grid section-pad">{defaultPrograms.concat(defaultPrograms.slice(0, 2)).map((p, i) => <article class={`gallery-tile tile-${i + 1} reveal`}><div class={`gallery-art tone-${p[3]}`}>{icon(p[0])}<span>لحظة أثر</span></div><p>{p[1]}<small>كفر العنانية</small></p></article>)}</section>
+    <section class="gallery-grid section-pad">
+      {galleryItems.map((item, i) => (
+        <article class={`gallery-tile tile-${i + 1} reveal`}>
+          <div class="gallery-art" style={`background-image:url(${item.img});background-size:cover;background-position:center;`}>
+            <span style="background:rgba(12,74,63,0.85);color:#fff">{item.tag}</span>
+          </div>
+          <p>{item.title}<small>{icon('fa-location-dot')} {item.location}</small></p>
+        </article>
+      ))}
+    </section>
   </Layout>
 }
 
@@ -570,9 +593,34 @@ function Events({ events = [], user }: { events?: any[], user?: any }) {
             <h3>{e.title}</h3>
             <p>{icon('fa-location-dot')} {e.place}</p>
           </div>
-          <a href="#">التفاصيل {icon('fa-arrow-left')}</a>
+          <a href={e.id ? `/events/${e.id}` : '#'}>التفاصيل {icon('fa-arrow-left')}</a>
         </article>
       })}
+    </section>
+  </Layout>
+}
+
+function EventDetail({ e, user }: { e: any, user?: any }) {
+  const dateObj = new Date(e.event_date)
+  const dateStr = dateObj.toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+  const timeStr = dateObj.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })
+  return <Layout user={user} title={`${e.title} | مؤسسة الدكتور عمر هشام`}>
+    <section class="page-hero" style="min-height:50vh; display:flex; flex-direction:column; justify-content:center">
+      <a href="/events" class="back-link" style="margin-bottom:1.5rem">{icon('fa-arrow-right')} كل الفعاليات</a>
+      <span class="category-chip" style="margin:0 auto">{e.type || 'فعالية'}</span>
+      <h1 style="font-size:clamp(1.8rem, 4vw, 3rem); margin: 1rem 0">{e.title}</h1>
+      <div style="display:flex; gap:1.5rem; justify-content:center; flex-wrap:wrap; color:var(--muted); font-size:.95rem">
+        <span>{icon('fa-calendar-day')} {dateStr}</span>
+        <span>{icon('fa-clock')} {timeStr}</span>
+        {e.place && <span>{icon('fa-location-dot')} {e.place}</span>}
+      </div>
+    </section>
+    <section class="section-pad" style="max-width:800px; margin:0 auto; padding-top:0">
+      {e.image_url && <img src={e.image_url} alt={e.title} style="width:100%; border-radius:16px; margin-bottom:2rem; object-fit:cover; max-height:400px; box-shadow:var(--shadow);" />}
+      {e.description && <div style="font-size:1.15rem; line-height:1.8; color:var(--text); white-space:pre-wrap">{e.description}</div>}
+      <div style="margin-top:2rem; text-align:center">
+        <a class="primary-btn" href="/volunteers">شارك في الفعالية {icon('fa-hand-holding-hand')}</a>
+      </div>
     </section>
   </Layout>
 }
@@ -1018,6 +1066,7 @@ function Dashboard({ view, data, user }: { view: string, data: any, user: any })
     ['fa-calendar', 'الفعاليات', 'events'],
     ['fa-heart', 'قصص النجاح', 'stories'],
     ['fa-briefcase', 'الوظائف', 'jobs'],
+    ['fa-file-signature', 'طلبات التوظيف', 'job_applications'],
     ['fa-envelope-open-text', 'النشرة البريدية', 'newsletter']
   ]
 
@@ -1047,6 +1096,7 @@ function Dashboard({ view, data, user }: { view: string, data: any, user: any })
         {view === 'events' && <DashEvents list={data.list} />}
         {view === 'stories' && <DashStories list={data.list} />}
         {view === 'jobs' && <DashJobs list={data.list} />}
+        {view === 'job_applications' && <DashJobApplications list={data.list} />}
         {view === 'newsletter' && <DashNewsletter list={data.list} />}
         {view === 'users' && <DashUsers list={data.list} currentUserId={user.id} />}
       </div>
@@ -1120,9 +1170,24 @@ function DashCampaigns({ list = [] }: { list: any[] }) {
               <td>{Number(c.raised || 0).toLocaleString('ar-EG')} ج.م</td>
               <td>{c.is_urgent ? 'نعم' : 'لا'}</td>
               <td>
-                <form action={`/api/campaigns/delete/${c.id}`} method="post" class="dash-action-form" data-confirm="هل أنت متأكد من حذف هذه الحملة؟">
-                  <button type="submit" style="background:#ff6b6b; color:#fff; border:none; padding:4px 8px; border-radius:4px; cursor:pointer">حذف</button>
-                </form>
+                <div style="display:flex; gap:6px; align-items:center">
+                  <button
+                    type="button"
+                    class="edit-campaign-btn"
+                    data-id={c.id}
+                    data-title={c.title}
+                    data-category={c.category}
+                    data-goal={c.goal}
+                    data-raised={c.raised || 0}
+                    data-urgent={c.is_urgent ? 'true' : 'false'}
+                    data-description={c.description || ''}
+                    data-image={c.image_url || ''}
+                    style="background:var(--blue-600); color:#fff; border:none; padding:4px 8px; border-radius:4px; cursor:pointer"
+                  >تعديل</button>
+                  <form action={`/api/campaigns/delete/${c.id}`} method="post" class="dash-action-form" data-confirm="هل أنت متأكد من حذف هذه الحملة؟">
+                    <button type="submit" style="background:#ff6b6b; color:#fff; border:none; padding:4px 8px; border-radius:4px; cursor:pointer">حذف</button>
+                  </form>
+                </div>
               </td>
             </tr>
           ))}
@@ -1148,9 +1213,42 @@ function DashCampaigns({ list = [] }: { list: any[] }) {
         </div>
         <label style="display:flex; align-items:center; gap:.5rem"><input type="checkbox" name="is_urgent" value="true" /> حملة عاجلة؟</label>
         <label>الوصف<textarea name="description" rows={3}></textarea></label>
-        <button class="primary-btn" type="submit">حفظ الحملة</button>
+        <button class="primary-btn" type="submit" id="campaign-submit-btn">حفظ الحملة</button>
       </form>
     </section>
+    <script dangerouslySetInnerHTML={{
+      __html: `
+      document.querySelectorAll('.edit-campaign-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var form = document.querySelector('form[action^="/api/campaigns/"]');
+          if (!form) return;
+          form.action = '/api/campaigns/edit/' + this.dataset.id;
+          form.querySelector('input[name="title"]').value = this.dataset.title || '';
+          form.querySelector('input[name="category"]').value = this.dataset.category || '';
+          form.querySelector('input[name="goal"]').value = this.dataset.goal || '';
+          var description = form.querySelector('textarea[name="description"]');
+          if (description) description.value = this.dataset.description || '';
+          var urgent = form.querySelector('input[name="is_urgent"]');
+          if (urgent) urgent.checked = this.dataset.urgent === 'true';
+          var imgInput = form.querySelector('.cloudinary-url');
+          if (imgInput) imgInput.value = this.dataset.image || '';
+          var fallbackInput = form.querySelector('.upload-url-fallback');
+          if (fallbackInput) fallbackInput.value = this.dataset.image || '';
+          var preview = form.querySelector('.upload-preview');
+          var placeholder = form.querySelector('.upload-placeholder');
+          if (this.dataset.image && preview && placeholder) {
+            preview.src = this.dataset.image;
+            preview.style.display = 'block';
+            placeholder.style.display = 'none';
+          }
+          var titleHeader = form.querySelector('h3');
+          if (titleHeader) titleHeader.textContent = 'تعديل الحملة';
+          var submitBtn = document.getElementById('campaign-submit-btn');
+          if (submitBtn) submitBtn.textContent = 'حفظ التعديلات';
+          form.scrollIntoView({ behavior: 'smooth' });
+        });
+      });
+    `}} />
   </>
 }
 
@@ -1302,9 +1400,22 @@ function DashNews({ list = [] }: { list: any[] }) {
               <td>{n.category}</td>
               <td style="max-width:300px">{n.excerpt}</td>
               <td>
-                <form action={`/api/news/delete/${n.id}`} method="post" style="display:inline">
-                  <button type="submit" style="background:#ff6b6b; color:#fff; border:none; padding:4px 8px; border-radius:4px; cursor:pointer">حذف</button>
-                </form>
+                <div style="display:flex; gap:6px; align-items:center">
+                  <button
+                    type="button"
+                    class="edit-news-btn"
+                    data-id={n.id}
+                    data-title={n.title}
+                    data-category={n.category}
+                    data-excerpt={n.excerpt}
+                    data-content={n.content || ''}
+                    data-image={n.image_url || ''}
+                    style="background:var(--blue-600); color:#fff; border:none; padding:4px 8px; border-radius:4px; cursor:pointer"
+                  >تعديل</button>
+                  <form action={`/api/news/delete/${n.id}`} method="post" style="display:inline">
+                    <button type="submit" style="background:#ff6b6b; color:#fff; border:none; padding:4px 8px; border-radius:4px; cursor:pointer">حذف</button>
+                  </form>
+                </div>
               </td>
             </tr>
           ))}
@@ -1329,9 +1440,40 @@ function DashNews({ list = [] }: { list: any[] }) {
         </div>
         <label>موجز الخبر (يظهر في القائمة)<input name="excerpt" required /></label>
         <label>محتوى الخبر بالكامل<textarea name="content" rows={6} required></textarea></label>
-        <button class="primary-btn" type="submit">نشر الخبر</button>
+        <button class="primary-btn" type="submit" id="news-submit-btn">نشر الخبر</button>
       </form>
     </section>
+    <script dangerouslySetInnerHTML={{
+      __html: `
+      document.querySelectorAll('.edit-news-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var form = document.querySelector('form[action^="/api/news/"]');
+          if (!form) return;
+          form.action = '/api/news/edit/' + this.dataset.id;
+          form.querySelector('input[name="title"]').value = this.dataset.title || '';
+          form.querySelector('input[name="category"]').value = this.dataset.category || '';
+          form.querySelector('input[name="excerpt"]').value = this.dataset.excerpt || '';
+          var content = form.querySelector('textarea[name="content"]');
+          if (content) content.value = this.dataset.content || '';
+          var imgInput = form.querySelector('.cloudinary-url');
+          if (imgInput) imgInput.value = this.dataset.image || '';
+          var fallbackInput = form.querySelector('.upload-url-fallback');
+          if (fallbackInput) fallbackInput.value = this.dataset.image || '';
+          var preview = form.querySelector('.upload-preview');
+          var placeholder = form.querySelector('.upload-placeholder');
+          if (this.dataset.image && preview && placeholder) {
+            preview.src = this.dataset.image;
+            preview.style.display = 'block';
+            placeholder.style.display = 'none';
+          }
+          var titleHeader = form.querySelector('h3');
+          if (titleHeader) titleHeader.textContent = 'تعديل الخبر';
+          var submitBtn = document.getElementById('news-submit-btn');
+          if (submitBtn) submitBtn.textContent = 'حفظ التعديلات';
+          form.scrollIntoView({ behavior: 'smooth' });
+        });
+      });
+    `}} />
   </>
 }
 
@@ -1358,9 +1500,23 @@ function DashEvents({ list = [] }: { list: any[] }) {
               <td>{e.place}</td>
               <td>{date}</td>
               <td>
-                <form action={`/api/events/delete/${e.id}`} method="post" style="display:inline">
-                  <button type="submit" style="background:#ff6b6b; color:#fff; border:none; padding:4px 8px; border-radius:4px; cursor:pointer">حذف</button>
-                </form>
+                <div style="display:flex; gap:6px; align-items:center">
+                  <button
+                    type="button"
+                    class="edit-event-btn"
+                    data-id={e.id}
+                    data-title={e.title}
+                    data-type={e.type}
+                    data-place={e.place}
+                    data-date={e.event_date ? new Date(e.event_date).toISOString().slice(0, 16) : ''}
+                    data-description={e.description || ''}
+                    data-image={e.image_url || ''}
+                    style="background:var(--blue-600); color:#fff; border:none; padding:4px 8px; border-radius:4px; cursor:pointer"
+                  >تعديل</button>
+                  <form action={`/api/events/delete/${e.id}`} method="post" style="display:inline">
+                    <button type="submit" style="background:#ff6b6b; color:#fff; border:none; padding:4px 8px; border-radius:4px; cursor:pointer">حذف</button>
+                  </form>
+                </div>
               </td>
             </tr>
           })}
@@ -1386,9 +1542,41 @@ function DashEvents({ list = [] }: { list: any[] }) {
           <div style="display:flex;align-items:center;gap:.5rem;margin-top:.5rem"><span style="font-size:.8rem;color:var(--muted)">أو</span><input class="upload-url-fallback" placeholder="أدخل رابط الصورة https://..." style="flex:1" /></div>
         </div>
         <label>الوصف<textarea name="description" rows={3}></textarea></label>
-        <button class="primary-btn" type="submit">حفظ الفعالية</button>
+        <button class="primary-btn" type="submit" id="event-submit-btn">حفظ الفعالية</button>
       </form>
     </section>
+    <script dangerouslySetInnerHTML={{
+      __html: `
+      document.querySelectorAll('.edit-event-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var form = document.querySelector('form[action^="/api/events/"]');
+          if (!form) return;
+          form.action = '/api/events/edit/' + this.dataset.id;
+          form.querySelector('input[name="title"]').value = this.dataset.title || '';
+          form.querySelector('input[name="type"]').value = this.dataset.type || '';
+          form.querySelector('input[name="place"]').value = this.dataset.place || '';
+          if (this.dataset.date) form.querySelector('input[name="event_date"]').value = this.dataset.date;
+          var description = form.querySelector('textarea[name="description"]');
+          if (description) description.value = this.dataset.description || '';
+          var imgInput = form.querySelector('.cloudinary-url');
+          if (imgInput) imgInput.value = this.dataset.image || '';
+          var fallbackInput = form.querySelector('.upload-url-fallback');
+          if (fallbackInput) fallbackInput.value = this.dataset.image || '';
+          var preview = form.querySelector('.upload-preview');
+          var placeholder = form.querySelector('.upload-placeholder');
+          if (this.dataset.image && preview && placeholder) {
+            preview.src = this.dataset.image;
+            preview.style.display = 'block';
+            placeholder.style.display = 'none';
+          }
+          var titleHeader = form.querySelector('h3');
+          if (titleHeader) titleHeader.textContent = 'تعديل الفعالية';
+          var submitBtn = document.getElementById('event-submit-btn');
+          if (submitBtn) submitBtn.textContent = 'حفظ التعديلات';
+          form.scrollIntoView({ behavior: 'smooth' });
+        });
+      });
+    `}} />
   </>
 }
 
@@ -1414,9 +1602,21 @@ function DashStories({ list = [] }: { list: any[] }) {
               <td style="max-width:300px">{s.content}</td>
               <td>{'★'.repeat(s.rating || 5)}</td>
               <td>
-                <form action={`/api/stories/delete/${s.id}`} method="post" style="display:inline">
-                  <button type="submit" style="background:#ff6b6b; color:#fff; border:none; padding:4px 8px; border-radius:4px; cursor:pointer">حذف</button>
-                </form>
+                <div style="display:flex; gap:6px; align-items:center">
+                  <button
+                    type="button"
+                    class="edit-story-btn"
+                    data-id={s.id}
+                    data-name={s.name}
+                    data-role={s.role}
+                    data-rating={s.rating || 5}
+                    data-content={s.content || ''}
+                    style="background:var(--blue-600); color:#fff; border:none; padding:4px 8px; border-radius:4px; cursor:pointer"
+                  >تعديل</button>
+                  <form action={`/api/stories/delete/${s.id}`} method="post" style="display:inline">
+                    <button type="submit" style="background:#ff6b6b; color:#fff; border:none; padding:4px 8px; border-radius:4px; cursor:pointer">حذف</button>
+                  </form>
+                </div>
               </td>
             </tr>
           ))}
@@ -1431,9 +1631,29 @@ function DashStories({ list = [] }: { list: any[] }) {
         <label>الدور / الصفة<input name="role" placeholder="مستفيد، متطوع" required /></label>
         <label>التقييم (1-5)<input type="number" name="rating" min="1" max="5" defaultValue="5" required /></label>
         <label>القصة كاملة<textarea name="content" rows={4} required></textarea></label>
-        <button class="primary-btn" type="submit">نشر القصة</button>
+        <button class="primary-btn" type="submit" id="story-submit-btn">نشر القصة</button>
       </form>
     </section>
+    <script dangerouslySetInnerHTML={{
+      __html: `
+      document.querySelectorAll('.edit-story-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var form = document.querySelector('form[action^="/api/stories/"]');
+          if (!form) return;
+          form.action = '/api/stories/edit/' + this.dataset.id;
+          form.querySelector('input[name="name"]').value = this.dataset.name || '';
+          form.querySelector('input[name="role"]').value = this.dataset.role || '';
+          form.querySelector('input[name="rating"]').value = this.dataset.rating || 5;
+          var content = form.querySelector('textarea[name="content"]');
+          if (content) content.value = this.dataset.content || '';
+          var titleHeader = form.querySelector('h3');
+          if (titleHeader) titleHeader.textContent = 'تعديل قصة النجاح';
+          var submitBtn = document.getElementById('story-submit-btn');
+          if (submitBtn) submitBtn.textContent = 'حفظ التعديلات';
+          form.scrollIntoView({ behavior: 'smooth' });
+        });
+      });
+    `}} />
   </>
 }
 
@@ -1461,9 +1681,23 @@ function DashJobs({ list = [] }: { list: any[] }) {
               <td>{j.location}</td>
               <td>{j.is_active ? 'نعم' : 'لا'}</td>
               <td>
-                <form action={`/api/jobs/delete/${j.id}`} method="post" style="display:inline">
-                  <button type="submit" style="background:#ff6b6b; color:#fff; border:none; padding:4px 8px; border-radius:4px; cursor:pointer">حذف</button>
-                </form>
+                <div style="display:flex; gap:6px; align-items:center">
+                  <button
+                    type="button"
+                    class="edit-job-btn"
+                    data-id={j.id}
+                    data-title={j.title}
+                    data-department={j.department}
+                    data-type={j.job_type}
+                    data-location={j.location}
+                    data-active={j.is_active ? 'true' : 'false'}
+                    data-description={j.description || ''}
+                    style="background:var(--blue-600); color:#fff; border:none; padding:4px 8px; border-radius:4px; cursor:pointer"
+                  >تعديل</button>
+                  <form action={`/api/jobs/delete/${j.id}`} method="post" style="display:inline">
+                    <button type="submit" style="background:#ff6b6b; color:#fff; border:none; padding:4px 8px; border-radius:4px; cursor:pointer">حذف</button>
+                  </form>
+                </div>
               </td>
             </tr>
           ))}
@@ -1480,10 +1714,64 @@ function DashJobs({ list = [] }: { list: any[] }) {
         <label>الموقع<input name="location" defaultValue="كفر العنانية" required /></label>
         <label>وصف الوظيفة والمتطلبات<textarea name="description" rows={5} required></textarea></label>
         <label style="display:flex; align-items:center; gap:.5rem"><input type="checkbox" name="is_active" value="true" defaultChecked /> وظيفة نشطة (تظهر في الموقع)؟</label>
-        <button class="primary-btn" type="submit">حفظ الوظيفة</button>
+        <button class="primary-btn" type="submit" id="job-submit-btn">حفظ الوظيفة</button>
       </form>
     </section>
+    <script dangerouslySetInnerHTML={{
+      __html: `
+      document.querySelectorAll('.edit-job-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var form = document.querySelector('form[action^="/api/jobs/"]');
+          if (!form) return;
+          form.action = '/api/jobs/edit/' + this.dataset.id;
+          form.querySelector('input[name="title"]').value = this.dataset.title || '';
+          form.querySelector('input[name="department"]').value = this.dataset.department || '';
+          form.querySelector('input[name="job_type"]').value = this.dataset.type || '';
+          form.querySelector('input[name="location"]').value = this.dataset.location || '';
+          var description = form.querySelector('textarea[name="description"]');
+          if (description) description.value = this.dataset.description || '';
+          var active = form.querySelector('input[name="is_active"]');
+          if (active) active.checked = this.dataset.active === 'true';
+          var titleHeader = form.querySelector('h3');
+          if (titleHeader) titleHeader.textContent = 'تعديل الوظيفة';
+          var submitBtn = document.getElementById('job-submit-btn');
+          if (submitBtn) submitBtn.textContent = 'حفظ التعديلات';
+          form.scrollIntoView({ behavior: 'smooth' });
+        });
+      });
+    `}} />
   </>
+}
+
+function DashJobApplications({ list = [] }: { list: any[] }) {
+  return <section class="dash-table">
+    <header><h3>طلبات التوظيف الواردة</h3></header>
+    <table>
+      <thead>
+        <tr>
+          <th>المتقدم</th>
+          <th>الوظيفة</th>
+          <th>الهاتف / الإيميل</th>
+          <th>السيرة الذاتية</th>
+          <th>الخبرات</th>
+          <th>التاريخ</th>
+        </tr>
+      </thead>
+      <tbody>
+        {list.map((a: any) => {
+          const date = a.created_at ? new Date(a.created_at).toLocaleDateString('ar-EG') : '-'
+          return <tr>
+            <td>{a.full_name}</td>
+            <td><span class="category-chip">{a.job_title || 'عام'}</span></td>
+            <td>{a.phone} / {a.email}</td>
+            <td>{a.cv_url ? <a href={a.cv_url} target="_blank" rel="noopener noreferrer" style="color:var(--blue-600);font-weight:600">عرض السيرة {icon('fa-arrow-up-right-from-square')}</a> : '-'}</td>
+            <td style="max-width:250px; white-space:pre-wrap">{a.bio || '-'}</td>
+            <td>{date}</td>
+          </tr>
+        })}
+      </tbody>
+    </table>
+  </section>
 }
 
 function DashNewsletter({ list = [] }: { list: any[] }) {
@@ -1680,7 +1968,16 @@ app.get('/campaigns/:id', async (c) => {
   }
 })
 
-app.get('/donate', (c) => c.html(<Donate user={(c as any).get('user')} />))
+app.get('/donate', async (c) => {
+  let campaigns: any[] = []
+  try {
+    const db = getFirestore(c)
+    const snap = await db.collection('campaigns').where('is_published', '==', true).get()
+    campaigns = snap.docs.map((doc: any) => ({ id: doc.id, ...doc.data() }))
+  } catch (e) {}
+  const selectedCampaignId = c.req.query('campaign') || ''
+  return c.html(<Donate campaigns={campaigns} selectedCampaignId={selectedCampaignId} user={(c as any).get('user')} />)
+})
 app.get('/achievements', (c) => c.html(<Achievements user={(c as any).get('user')} />))
 app.get('/volunteers', (c) => c.html(<Volunteers user={(c as any).get('user')} />))
 
@@ -1722,6 +2019,21 @@ app.get('/events', async (c) => {
     events = snap.docs.map((doc: any) => ({ id: doc.id, ...doc.data() }))
   } catch (e) { }
   return c.html(<Events events={events} user={(c as any).get('user')} />)
+})
+
+app.get('/events/:id', async (c) => {
+  const id = c.req.param('id')
+  try {
+    const db = getFirestore(c)
+    const doc = await db.collection('events').doc(id).get()
+    if (!doc.exists) {
+      return c.notFound()
+    }
+    const event = { id: doc.id, ...doc.data() }
+    return c.html(<EventDetail e={event} user={(c as any).get('user')} />)
+  } catch (e) {
+    return c.notFound()
+  }
 })
 
 app.get('/success-stories', async (c) => {
@@ -1881,6 +2193,11 @@ app.get('/dashboard', async (c) => {
       }
     } else if (view === 'jobs') {
       const snap = await db.collection('jobs').orderBy('created_at', 'desc').get()
+      viewData = {
+        list: snap.docs.map((doc: any) => ({ id: doc.id, ...doc.data() }))
+      }
+    } else if (view === 'job_applications') {
+      const snap = await db.collection('job_applications').orderBy('created_at', 'desc').get()
       viewData = {
         list: snap.docs.map((doc: any) => ({ id: doc.id, ...doc.data() }))
       }
